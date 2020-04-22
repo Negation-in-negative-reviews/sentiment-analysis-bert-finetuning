@@ -1,0 +1,272 @@
+nohup: ignoring input
+2020-04-21 20:56:56.134749: W tensorflow/stream_executor/platform/default/dso_loader.cc:55] Could not load dynamic library 'libnvinfer.so.6'; dlerror: libnvinfer.so.6: cannot open shared object file: No such file or directory
+2020-04-21 20:56:56.134868: W tensorflow/stream_executor/platform/default/dso_loader.cc:55] Could not load dynamic library 'libnvinfer_plugin.so.6'; dlerror: libnvinfer_plugin.so.6: cannot open shared object file: No such file or directory
+2020-04-21 20:56:56.134881: W tensorflow/compiler/tf2tensorrt/utils/py_utils.cc:30] Cannot dlopen some TensorRT libraries. If you would like to use Nvidia GPU with TensorRT, please make sure the missing libraries mentioned above are installed properly.
+There are 4 GPU(s) available.
+We will use the GPU: TITAN Xp
+Loading BERT tokenizer...
+Max sentence length:  135
+18,000 training samples
+2,000 validation samples
+
+======== Epoch 1 / 4 ========
+Training...
+  Batch    40  of  2,250.    Elapsed: 0.
+  Batch    80  of  2,250.    Elapsed: 0.
+  Batch   120  of  2,250.    Elapsed: 0.
+  Batch   160  of  2,250.    Elapsed: 0.
+  Batch   200  of  2,250.    Elapsed: 0.
+  Batch   240  of  2,250.    Elapsed: 0.
+  Batch   280  of  2,250.    Elapsed: 0.
+  Batch   320  of  2,250.    Elapsed: 0.
+  Batch   360  of  2,250.    Elapsed: 0.
+  Batch   400  of  2,250.    Elapsed: 0.
+  Batch   440  of  2,250.    Elapsed: 0.
+  Batch   480  of  2,250.    Elapsed: 0.
+  Batch   520  of  2,250.    Elapsed: 0.
+  Batch   560  of  2,250.    Elapsed: 0.
+  Batch   600  of  2,250.    Elapsed: 0.
+  Batch   640  of  2,250.    Elapsed: 0.
+  Batch   680  of  2,250.    Elapsed: 0.
+  Batch   720  of  2,250.    Elapsed: 0.
+  Batch   760  of  2,250.    Elapsed: 0.
+  Batch   800  of  2,250.    Elapsed: 0.
+  Batch   840  of  2,250.    Elapsed: 0.
+  Batch   880  of  2,250.    Elapsed: 0.
+  Batch   920  of  2,250.    Elapsed: 0.
+  Batch   960  of  2,250.    Elapsed: 0.
+  Batch 1,000  of  2,250.    Elapsed: 0.
+  Batch 1,040  of  2,250.    Elapsed: 0.
+  Batch 1,080  of  2,250.    Elapsed: 0.
+  Batch 1,120  of  2,250.    Elapsed: 0.
+  Batch 1,160  of  2,250.    Elapsed: 0.
+  Batch 1,200  of  2,250.    Elapsed: 0.
+  Batch 1,240  of  2,250.    Elapsed: 0.
+  Batch 1,280  of  2,250.    Elapsed: 0.
+  Batch 1,320  of  2,250.    Elapsed: 0.
+  Batch 1,360  of  2,250.    Elapsed: 0.
+  Batch 1,400  of  2,250.    Elapsed: 0.
+  Batch 1,440  of  2,250.    Elapsed: 0.
+  Batch 1,480  of  2,250.    Elapsed: 0.
+  Batch 1,520  of  2,250.    Elapsed: 0.
+  Batch 1,560  of  2,250.    Elapsed: 0.
+  Batch 1,600  of  2,250.    Elapsed: 0.
+  Batch 1,640  of  2,250.    Elapsed: 0.
+  Batch 1,680  of  2,250.    Elapsed: 0.
+  Batch 1,720  of  2,250.    Elapsed: 0.
+  Batch 1,760  of  2,250.    Elapsed: 0.
+  Batch 1,800  of  2,250.    Elapsed: 0.
+  Batch 1,840  of  2,250.    Elapsed: 0.
+  Batch 1,880  of  2,250.    Elapsed: 0.
+  Batch 1,920  of  2,250.    Elapsed: 0.
+  Batch 1,960  of  2,250.    Elapsed: 0.
+  Batch 2,000  of  2,250.    Elapsed: 0.
+  Batch 2,040  of  2,250.    Elapsed: 0.
+  Batch 2,080  of  2,250.    Elapsed: 0.
+  Batch 2,120  of  2,250.    Elapsed: 0.
+  Batch 2,160  of  2,250.    Elapsed: 0.
+  Batch 2,200  of  2,250.    Elapsed: 0.
+  Batch 2,240  of  2,250.    Elapsed: 0.
+
+  Average training loss: 0.70
+
+Running Validation...
+  Accuracy: 0.49
+  Validation Loss: 0.69
+
+======== Epoch 2 / 4 ========
+Training...
+  Batch    40  of  2,250.    Elapsed: 0.
+  Batch    80  of  2,250.    Elapsed: 0.
+  Batch   120  of  2,250.    Elapsed: 0.
+  Batch   160  of  2,250.    Elapsed: 0.
+  Batch   200  of  2,250.    Elapsed: 0.
+  Batch   240  of  2,250.    Elapsed: 0.
+  Batch   280  of  2,250.    Elapsed: 0.
+  Batch   320  of  2,250.    Elapsed: 0.
+  Batch   360  of  2,250.    Elapsed: 0.
+  Batch   400  of  2,250.    Elapsed: 0.
+  Batch   440  of  2,250.    Elapsed: 0.
+  Batch   480  of  2,250.    Elapsed: 0.
+  Batch   520  of  2,250.    Elapsed: 0.
+  Batch   560  of  2,250.    Elapsed: 0.
+  Batch   600  of  2,250.    Elapsed: 0.
+  Batch   640  of  2,250.    Elapsed: 0.
+  Batch   680  of  2,250.    Elapsed: 0.
+  Batch   720  of  2,250.    Elapsed: 0.
+  Batch   760  of  2,250.    Elapsed: 0.
+  Batch   800  of  2,250.    Elapsed: 0.
+  Batch   840  of  2,250.    Elapsed: 0.
+  Batch   880  of  2,250.    Elapsed: 0.
+  Batch   920  of  2,250.    Elapsed: 0.
+  Batch   960  of  2,250.    Elapsed: 0.
+  Batch 1,000  of  2,250.    Elapsed: 0.
+  Batch 1,040  of  2,250.    Elapsed: 0.
+  Batch 1,080  of  2,250.    Elapsed: 0.
+  Batch 1,120  of  2,250.    Elapsed: 0.
+  Batch 1,160  of  2,250.    Elapsed: 0.
+  Batch 1,200  of  2,250.    Elapsed: 0.
+  Batch 1,240  of  2,250.    Elapsed: 0.
+  Batch 1,280  of  2,250.    Elapsed: 0.
+  Batch 1,320  of  2,250.    Elapsed: 0.
+  Batch 1,360  of  2,250.    Elapsed: 0.
+  Batch 1,400  of  2,250.    Elapsed: 0.
+  Batch 1,440  of  2,250.    Elapsed: 0.
+  Batch 1,480  of  2,250.    Elapsed: 0.
+  Batch 1,520  of  2,250.    Elapsed: 0.
+  Batch 1,560  of  2,250.    Elapsed: 0.
+  Batch 1,600  of  2,250.    Elapsed: 0.
+  Batch 1,640  of  2,250.    Elapsed: 0.
+  Batch 1,680  of  2,250.    Elapsed: 0.
+  Batch 1,720  of  2,250.    Elapsed: 0.
+  Batch 1,760  of  2,250.    Elapsed: 0.
+  Batch 1,800  of  2,250.    Elapsed: 0.
+  Batch 1,840  of  2,250.    Elapsed: 0.
+  Batch 1,880  of  2,250.    Elapsed: 0.
+  Batch 1,920  of  2,250.    Elapsed: 0.
+  Batch 1,960  of  2,250.    Elapsed: 0.
+  Batch 2,000  of  2,250.    Elapsed: 0.
+  Batch 2,040  of  2,250.    Elapsed: 0.
+  Batch 2,080  of  2,250.    Elapsed: 0.
+  Batch 2,120  of  2,250.    Elapsed: 0.
+  Batch 2,160  of  2,250.    Elapsed: 0.
+  Batch 2,200  of  2,250.    Elapsed: 0.
+  Batch 2,240  of  2,250.    Elapsed: 0.
+
+  Average training loss: 0.69
+
+Running Validation...
+  Accuracy: 0.51
+  Validation Loss: 0.70
+
+======== Epoch 3 / 4 ========
+Training...
+  Batch    40  of  2,250.    Elapsed: 0.
+  Batch    80  of  2,250.    Elapsed: 0.
+  Batch   120  of  2,250.    Elapsed: 0.
+  Batch   160  of  2,250.    Elapsed: 0.
+  Batch   200  of  2,250.    Elapsed: 0.
+  Batch   240  of  2,250.    Elapsed: 0.
+  Batch   280  of  2,250.    Elapsed: 0.
+  Batch   320  of  2,250.    Elapsed: 0.
+  Batch   360  of  2,250.    Elapsed: 0.
+  Batch   400  of  2,250.    Elapsed: 0.
+  Batch   440  of  2,250.    Elapsed: 0.
+  Batch   480  of  2,250.    Elapsed: 0.
+  Batch   520  of  2,250.    Elapsed: 0.
+  Batch   560  of  2,250.    Elapsed: 0.
+  Batch   600  of  2,250.    Elapsed: 0.
+  Batch   640  of  2,250.    Elapsed: 0.
+  Batch   680  of  2,250.    Elapsed: 0.
+  Batch   720  of  2,250.    Elapsed: 0.
+  Batch   760  of  2,250.    Elapsed: 0.
+  Batch   800  of  2,250.    Elapsed: 0.
+  Batch   840  of  2,250.    Elapsed: 0.
+  Batch   880  of  2,250.    Elapsed: 0.
+  Batch   920  of  2,250.    Elapsed: 0.
+  Batch   960  of  2,250.    Elapsed: 0.
+  Batch 1,000  of  2,250.    Elapsed: 0.
+  Batch 1,040  of  2,250.    Elapsed: 0.
+  Batch 1,080  of  2,250.    Elapsed: 0.
+  Batch 1,120  of  2,250.    Elapsed: 0.
+  Batch 1,160  of  2,250.    Elapsed: 0.
+  Batch 1,200  of  2,250.    Elapsed: 0.
+  Batch 1,240  of  2,250.    Elapsed: 0.
+  Batch 1,280  of  2,250.    Elapsed: 0.
+  Batch 1,320  of  2,250.    Elapsed: 0.
+  Batch 1,360  of  2,250.    Elapsed: 0.
+  Batch 1,400  of  2,250.    Elapsed: 0.
+  Batch 1,440  of  2,250.    Elapsed: 0.
+  Batch 1,480  of  2,250.    Elapsed: 0.
+  Batch 1,520  of  2,250.    Elapsed: 0.
+  Batch 1,560  of  2,250.    Elapsed: 0.
+  Batch 1,600  of  2,250.    Elapsed: 0.
+  Batch 1,640  of  2,250.    Elapsed: 0.
+  Batch 1,680  of  2,250.    Elapsed: 0.
+  Batch 1,720  of  2,250.    Elapsed: 0.
+  Batch 1,760  of  2,250.    Elapsed: 0.
+  Batch 1,800  of  2,250.    Elapsed: 0.
+  Batch 1,840  of  2,250.    Elapsed: 0.
+  Batch 1,880  of  2,250.    Elapsed: 0.
+  Batch 1,920  of  2,250.    Elapsed: 0.
+  Batch 1,960  of  2,250.    Elapsed: 0.
+  Batch 2,000  of  2,250.    Elapsed: 0.
+  Batch 2,040  of  2,250.    Elapsed: 0.
+  Batch 2,080  of  2,250.    Elapsed: 0.
+  Batch 2,120  of  2,250.    Elapsed: 0.
+  Batch 2,160  of  2,250.    Elapsed: 0.
+  Batch 2,200  of  2,250.    Elapsed: 0.
+  Batch 2,240  of  2,250.    Elapsed: 0.
+
+  Average training loss: 0.66
+
+Running Validation...
+  Accuracy: 0.49
+  Validation Loss: 0.77
+
+======== Epoch 4 / 4 ========
+Training...
+  Batch    40  of  2,250.    Elapsed: 0.
+  Batch    80  of  2,250.    Elapsed: 0.
+  Batch   120  of  2,250.    Elapsed: 0.
+  Batch   160  of  2,250.    Elapsed: 0.
+  Batch   200  of  2,250.    Elapsed: 0.
+  Batch   240  of  2,250.    Elapsed: 0.
+  Batch   280  of  2,250.    Elapsed: 0.
+  Batch   320  of  2,250.    Elapsed: 0.
+  Batch   360  of  2,250.    Elapsed: 0.
+  Batch   400  of  2,250.    Elapsed: 0.
+  Batch   440  of  2,250.    Elapsed: 0.
+  Batch   480  of  2,250.    Elapsed: 0.
+  Batch   520  of  2,250.    Elapsed: 0.
+  Batch   560  of  2,250.    Elapsed: 0.
+  Batch   600  of  2,250.    Elapsed: 0.
+  Batch   640  of  2,250.    Elapsed: 0.
+  Batch   680  of  2,250.    Elapsed: 0.
+  Batch   720  of  2,250.    Elapsed: 0.
+  Batch   760  of  2,250.    Elapsed: 0.
+  Batch   800  of  2,250.    Elapsed: 0.
+  Batch   840  of  2,250.    Elapsed: 0.
+  Batch   880  of  2,250.    Elapsed: 0.
+  Batch   920  of  2,250.    Elapsed: 0.
+  Batch   960  of  2,250.    Elapsed: 0.
+  Batch 1,000  of  2,250.    Elapsed: 0.
+  Batch 1,040  of  2,250.    Elapsed: 0.
+  Batch 1,080  of  2,250.    Elapsed: 0.
+  Batch 1,120  of  2,250.    Elapsed: 0.
+  Batch 1,160  of  2,250.    Elapsed: 0.
+  Batch 1,200  of  2,250.    Elapsed: 0.
+  Batch 1,240  of  2,250.    Elapsed: 0.
+  Batch 1,280  of  2,250.    Elapsed: 0.
+  Batch 1,320  of  2,250.    Elapsed: 0.
+  Batch 1,360  of  2,250.    Elapsed: 0.
+  Batch 1,400  of  2,250.    Elapsed: 0.
+  Batch 1,440  of  2,250.    Elapsed: 0.
+  Batch 1,480  of  2,250.    Elapsed: 0.
+  Batch 1,520  of  2,250.    Elapsed: 0.
+  Batch 1,560  of  2,250.    Elapsed: 0.
+  Batch 1,600  of  2,250.    Elapsed: 0.
+  Batch 1,640  of  2,250.    Elapsed: 0.
+  Batch 1,680  of  2,250.    Elapsed: 0.
+  Batch 1,720  of  2,250.    Elapsed: 0.
+  Batch 1,760  of  2,250.    Elapsed: 0.
+  Batch 1,800  of  2,250.    Elapsed: 0.
+  Batch 1,840  of  2,250.    Elapsed: 0.
+  Batch 1,880  of  2,250.    Elapsed: 0.
+  Batch 1,920  of  2,250.    Elapsed: 0.
+  Batch 1,960  of  2,250.    Elapsed: 0.
+  Batch 2,000  of  2,250.    Elapsed: 0.
+  Batch 2,040  of  2,250.    Elapsed: 0.
+  Batch 2,080  of  2,250.    Elapsed: 0.
+  Batch 2,120  of  2,250.    Elapsed: 0.
+  Batch 2,160  of  2,250.    Elapsed: 0.
+  Batch 2,200  of  2,250.    Elapsed: 0.
+  Batch 2,240  of  2,250.    Elapsed: 0.
+
+  Average training loss: 0.49
+
+Running Validation...
+  Accuracy: 0.50
+  Validation Loss: 1.03
+
+Training complete!
