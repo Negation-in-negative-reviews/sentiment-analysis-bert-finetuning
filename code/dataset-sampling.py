@@ -1,6 +1,6 @@
 import numpy as np
 
-def get_random_samples(n_samples:int, filename: str, rand_flag:bool = True):
+def get_random_samples(n_samples:int, filename: str, rand_flag:bool):
 
     samples = []
     with open(filename, "r") as fin:
@@ -30,13 +30,13 @@ if __name__ == "__main__":
     seed_val = 23
     np.random.seed(seed_val)
     
-    n_samples = 10000
-    file0 = "/data/madhu/imdb_dataset/processed_data/neg_samples_full_sents"
-    file1 = "/data/madhu/imdb_dataset/processed_data/pos_samples_full_sents"
+    # n_samples = 10000
+    # file0 = "/data/madhu/imdb_dataset/processed_data/neg_samples_full_sents"
+    # file1 = "/data/madhu/imdb_dataset/processed_data/pos_samples_full_sents"
 
-    # n_samples = int(6e3)
-    # file0 = "/data/madhu/yelp/yelp_processed_data/review.0"
-    # file1 = "/data/madhu/yelp/yelp_processed_data/review.1"
+    n_samples = int(6e3)
+    file0 = "/data/madhu/yelp/yelp_processed_data/review.0"
+    file1 = "/data/madhu/yelp/yelp_processed_data/review.1"
 
     # n_samples = int(5e3)
     # file0 = "/data/madhu/yelp/shen_et_al_data/sentiment.train.0"

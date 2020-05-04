@@ -14,16 +14,16 @@ import utils
 import datetime
 import logging
 
-if __name__ == "__main__":
-   
+def test(testfile_pos:str, testfile_neg:str, args:dict, truncation:str):
 
-    pos_file = "/data/madhu/yelp/yelp_processed_data/review.1_5000samples"
-    neg_file = "/data/madhu/yelp/yelp_processed_data/review.0_5000samples"
 
-    # pos_file = "/data/madhu/imdb_dataset/processed_data/pos_samples_full"
-    # neg_file = "/data/madhu/imdb_dataset/processed_data/neg_samples_full"
+    # pos_file = "/data/madhu/yelp/yelp_processed_data/review.1_5000samples"
+    # neg_file = "/data/madhu/yelp/yelp_processed_data/review.0_5000samples"
 
-    device = utils.get_device(device_no=0)
+    # # pos_file = "/data/madhu/imdb_dataset/processed_data/pos_samples_full"
+    # # neg_file = "/data/madhu/imdb_dataset/processed_data/neg_samples_full"
+
+    device = utils.get_device(device_no=3)
     saves_dir = "saves/"
 
     Path(saves_dir).mkdir(parents=True, exist_ok=True)   
@@ -43,7 +43,7 @@ if __name__ == "__main__":
     tokenizer = BertTokenizer.from_pretrained('bert-base-uncased', do_lower_case=True)
     max_len = 0
 
-    reviews, labels = utils.read_samples(filename0=neg_file, filename1=pos_file)
+    reviews, labels = utils.read_samples(filename0=testfile_neg, filename1=testfile_pos)
     # For every sentence...
     # for rev in reviews:
     #     # Tokenize the text and add `[CLS]` and `[SEP]` tokens.
@@ -67,12 +67,16 @@ if __name__ == "__main__":
         #   (5) Pad or truncate the sentence to `max_length`
         #   (6) Create attention masks for [PAD] tokens.
         input_id = tokenizer.encode(rev, add_special_tokens=True)
-        if len(input_id) > 512:            
-            # tail-only truncation
-            input_id = [tokenizer.cls_token_id]+input_id[-511:]      
-
-            # head-and-tail truncation       
-            # input_id = [tokenizer.cls_token_id]+input_id[1:129]+input_id[-382:]+[tokenizer.sep_token_id]
+        if len(input_id) > 512:                         
+            if truncation == "tail-only":
+                # tail-only truncation
+                input_id = [tokenizer.cls_token_id]+input_id[-511:]      
+            elif truncation == "head-and-tail":
+                # head-and-tail truncation       
+                input_id = [tokenizer.cls_token_id]+input_id[1:129]+input_id[-382:]+[tokenizer.sep_token_id]
+            else:
+                # head-only truncation
+                input_id = input_id[:511]+[tokenizer.sep_token_id]
 
             input_ids.append(torch.tensor(input_id).view(1,-1))
             attention_masks.append(torch.ones([1,len(input_id)], dtype=torch.long))
@@ -101,18 +105,10 @@ if __name__ == "__main__":
     # Combine the training inputs into a TensorDataset.
     dataset = TensorDataset(input_ids, attention_masks, labels)
 
-    # Create a 90-10 train-validation split.
-    # Calculate the number of samples to include in each set.
-    train_size = int(0.9 * len(dataset))
-    val_size = len(dataset) - train_size
-
-    # Divide the dataset by randomly selecting samples.
-    train_dataset, val_dataset = random_split(dataset, [train_size, val_size])
-
-    # print('{:>5,} training samples'.format(train_size))
-    logger.info('{:>5,} training samples'.format(train_size))
-    # print('{:>5,} validation samples'.format(val_size))
-    logger.info('{:>5,} validation samples'.format(val_size))
+    test_size = int(len(dataset))
+    
+    logger.info('{:>5,} test samples'.format(train_size))
+    
     # The DataLoader needs to know our batch size for training, so we specify it 
     # here. For fine-tuning BERT on a specific task, the authors recommend a batch 
     # size of 16 or 32.
@@ -120,19 +116,11 @@ if __name__ == "__main__":
 
     # Create the DataLoaders for our training and validation sets.
     # We'll take training samples in random order. 
-    train_dataloader = DataLoader(
-                train_dataset,  # The training samples.
-                sampler = RandomSampler(train_dataset), # Select batches randomly
+    test_dataloader = DataLoader(
+                dataset,  # The training samples.
+                sampler = RandomSampler(dataset), # Select batches randomly
                 batch_size = batch_size # Trains with this batch size.
             )
-
-    # For validation the order doesn't matter, so we'll just read them sequentially.
-    validation_dataloader = DataLoader(
-                val_dataset, # The validation samples.
-                sampler = SequentialSampler(val_dataset), # Pull out batches sequentially.
-                batch_size = batch_size # Evaluate with this batch size.
-            )
-
 
     # Load BertForSequenceClassification, the pretrained BERT model with a single 
     # linear classification layer on top. 
@@ -161,7 +149,7 @@ if __name__ == "__main__":
 
     # Total number of training steps is [number of batches] x [number of epochs]. 
     # (Note that this is not the same as the number of training samples).
-    total_steps = len(train_dataloader) * epochs
+    total_steps = len(test_dataloader) * epochs
 
     # Create the learning rate scheduler.
     scheduler = get_linear_schedule_with_warmup(optimizer, 
@@ -178,10 +166,6 @@ if __name__ == "__main__":
     np.random.seed(seed_val)
     torch.manual_seed(seed_val)
     torch.cuda.manual_seed_all(seed_val)
-
-    # We'll store a number of quantities such as training and validation loss, 
-    # validation accuracy, and timings.
-    training_stats = []
 
     # Measure the total training time for the whole run.
     total_t0 = time.time()
@@ -206,13 +190,13 @@ if __name__ == "__main__":
         t0 = time.time()
 
         # Reset the total loss for this epoch.
-        total_train_loss = 0
+        total_test_loss = 0
 
         # Put the model into training mode. Don't be mislead--the call to 
         # `train` just changes the *mode*, it doesn't *perform* the training.
         # `dropout` and `batchnorm` layers behave differently during training
         # vs. test (source: https://stackoverflow.com/questions/51433378/what-does-model-train-do-in-pytorch)
-        model.train()
+        model.eval()
 
         # For each batch of training data...
         for step, batch in enumerate(train_dataloader):

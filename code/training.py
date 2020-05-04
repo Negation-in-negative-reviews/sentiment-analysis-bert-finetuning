@@ -13,6 +13,7 @@ from pathlib import Path
 import utils
 import datetime
 import logging
+from torch import nn
 
 # Function to calculate the accuracy of our predictions vs labels
 def flat_accuracy(preds, labels):
@@ -31,16 +32,13 @@ def format_time(elapsed):
     return str(datetime.timedelta(seconds=elapsed_rounded))
 
 
-def train_model(pos_file:str, neg_file:str, args: dict, truncation:str):
-   
-    
-    device = utils.get_device(device_no=3)
+def train_model(pos_file:str, neg_file:str, args: dict, truncation:str, n_samples:int=None):
+    seed_val = args["seed_val"]
+    device = utils.get_device(device_no=2)
     saves_dir = "saves/"
 
     Path(saves_dir).mkdir(parents=True, exist_ok=True)   
     time = datetime.datetime.now()
-
-    
 
     saves_path = os.path.join(saves_dir, utils.get_filename(time))
     Path(saves_path).mkdir(parents=True, exist_ok=True)
@@ -61,7 +59,7 @@ def train_model(pos_file:str, neg_file:str, args: dict, truncation:str):
     tokenizer = BertTokenizer.from_pretrained('bert-base-uncased', do_lower_case=True)
     max_len = 0
 
-    reviews, labels = utils.read_samples(filename0=neg_file, filename1=pos_file)
+    reviews, labels = utils.read_samples(filename0=neg_file, filename1=pos_file, seed_val=seed_val, n_samples=n_samples)
     # For every sentence...
     # for rev in reviews:
     #     # Tokenize the text and add `[CLS]` and `[SEP]` tokens.
@@ -159,14 +157,15 @@ def train_model(pos_file:str, neg_file:str, args: dict, truncation:str):
 
     # Load BertForSequenceClassification, the pretrained BERT model with a single 
     # linear classification layer on top. 
-    model = BertForSequenceClassification.from_pretrained(
+    model = BertForSequenceClassification.from_pretrained(        
         "bert-base-uncased", # Use the 12-layer BERT model, with an uncased vocab.
+        # config=configuration,
         num_labels = 2, # The number of output labels--2 for binary classification.
                         # You can increase this for multi-class tasks.   
         output_attentions = False, # Whether the model returns attentions weights.
-        output_hidden_states = False, # Whether the model returns all hidden-states.
+        output_hidden_states = False, # Whether the model returns all hidden-states.        
     )
-
+    # model.classifier = nn.Linear(args["final_hidden_size"], model.config.num_labels)
     # Tell pytorch to run this model on the GPU.
     model.cuda(device=device)
 
@@ -180,7 +179,7 @@ def train_model(pos_file:str, neg_file:str, args: dict, truncation:str):
     # Number of training epochs. The BERT authors recommend between 2 and 4. 
     # We chose to run for 4, but we'll see later that this may be over-fitting the
     # training data.
-    epochs = 3
+    epochs = 4
 
     # Total number of training steps is [number of batches] x [number of epochs]. 
     # (Note that this is not the same as the number of training samples).
@@ -195,8 +194,6 @@ def train_model(pos_file:str, neg_file:str, args: dict, truncation:str):
     # https://github.com/huggingface/transformers/blob/5bfcd0485ece086ebcbed2d008813037968a9e58/examples/run_glue.py#L128
 
     # Set the seed value all over the place to make this reproducible.
-    seed_val = args["seed_val"]
-
     random.seed(seed_val)
     np.random.seed(seed_val)
     torch.manual_seed(seed_val)
@@ -217,10 +214,6 @@ def train_model(pos_file:str, neg_file:str, args: dict, truncation:str):
         # ========================================
         
         # Perform one full pass over the training set.
-
-        # print("")
-        # print('======== Epoch {:} / {:} ========'.format(epoch_i + 1, epochs))
-        # print('Training...')
         logger.info("")
         logger.info('======== Epoch {:} / {:} ========'.format(epoch_i + 1, epochs))
         logger.info('Training...')
@@ -260,10 +253,7 @@ def train_model(pos_file:str, neg_file:str, args: dict, truncation:str):
             #   [2]: labels 
             b_input_ids = batch[0].to(device)
             b_input_mask = batch[1].to(device)
-            b_labels = batch[2].to(device)
-            # print(b_input_ids.shape)
-            # print(b_input_mask.shape)
-            # print(b_labels.shape)
+            b_labels = batch[2].to(device)           
 
             # Always clear any previously calculated gradients before performing a
             # backward pass. PyTorch doesn't do this automatically because 
@@ -410,64 +400,55 @@ def train_model(pos_file:str, neg_file:str, args: dict, truncation:str):
 
     logger.info("")
     logger.info("Training complete!")
-
+    handlers = logger.handlers[:]
+    for handler in handlers:
+        handler.close()
+        logger.removeHandler(handler)
     # print("Total training took {:} (h:mm:ss)".format(format_time(time.time()-total_t0)))
 
 
 if __name__=="__main__":
-    files = [
-        {
-            "pos_file": "/data/madhu/yelp/yelp_processed_data/review.1_5000samples",
-            "neg_file": "/data/madhu/yelp/yelp_processed_data/review.0_5000samples",
-            "truncation": "tail-only"
-        }, 
+    files = [      
         # {
-        #     "pos_file": "/data/madhu/imdb_dataset/processed_data/pos_samples_full",
-        #     "neg_file": "/data/madhu/imdb_dataset/processed_data/neg_samples_full"
-        # },
+        #     "pos_file": "/data/madhu/yelp/yelp_processed_data/review.1_train",
+        #     "neg_file": "/data/madhu/yelp/yelp_processed_data/review.0_train",
+        #     "truncation": "head-and-tail",
+        #     "n_samples": 5000
+        # }, 
+        # {
+        #     "pos_file": "/data/madhu/yelp/shen_et_al_data/sentiment.train.1",
+        #     "neg_file": "/data/madhu/yelp/shen_et_al_data/sentiment.train.0",
+        #     "truncation": "head-and-tail",
+        #     "n_samples": 5000
+        # },        
         {
-            "pos_file": "/data/madhu/yelp/shen_et_al_data/sentiment.train.0_5000samples",
-            "neg_file": "/data/madhu/yelp/shen_et_al_data/sentiment.train.1_5000samples",
-            "truncation": "tail-only"
-        },
-        {
-            "pos_file": "/data/madhu/imdb_dataset/processed_data/pos_samples_full_sents_10000samples",
-            "neg_file": "/data/madhu/imdb_dataset/processed_data/neg_samples_full_sents_10000samples",
+            "pos_file": "/data/madhu/imdb_dataset/processed_data/pos_reviews_train",
+            "neg_file": "/data/madhu/imdb_dataset/processed_data/neg_reviews_train",
             "truncation": "head-and-tail"
-        }
-
+        },        
     ]
 
-    args = [
-         {
-            "learning_rate": 2e-5,
+    args = [       
+        # {
+        #     "learning_rate": 2e-5,
+        #     "batch_size": 8,
+        #     "seed_val": 23,
+        #     "adam_epsilon": 1e-8
+        # },        
+        {
+            "learning_rate": 1e-5,
             "batch_size": 8,
             "seed_val": 23,
             "adam_epsilon": 1e-8
-        },
-        # {
-        #     "learning_rate": 1e-4,
-        #     "batch_size": 8,
-        #     "seed_val": 23,
-        #     "adam_epsilon": 1e-8
-        # },
-        # {
-        #     "learning_rate": 1e-3,
-        #     "batch_size": 8,
-        #     "seed_val": 23,
-        #     "adam_epsilon": 1e-8
-        # },
-        # {
-        #     "learning_rate": 1e-2,
-        #     "batch_size": 8,
-        #     "seed_val": 23,
-        #     "adam_epsilon": 1e-8
-        # }
+        },        
     ]
 
     for f in files:
         for params in args:            
-            train_model(f["pos_file"], f["neg_file"], params, f["truncation"])
+            if "n_samples" in f:
+                train_model(f["pos_file"], f["neg_file"], params, f["truncation"], f["n_samples"])
+            else:
+                train_model(f["pos_file"], f["neg_file"], params, f["truncation"])
     
 
     
