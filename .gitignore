@@ -4,3 +4,4 @@ not-needed/
 saves/
 __pycache__
 sample_data/
+*.out

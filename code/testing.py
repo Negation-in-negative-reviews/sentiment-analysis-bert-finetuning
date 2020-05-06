@@ -221,35 +221,50 @@ if __name__=="__main__":
             
 
         # imdb test reviews
-        {
-            "file": "/data/madhu/imdb_dataset/processed_data/neg_reviews_test",
-           "model_path": "saves/Apr-27-2020_21-10-49/model_1epochs",
-            "label": "negative",
-            "truncation": "head-and-tail",            
-        },
-        {
-            "file": "/data/madhu/imdb_dataset/processed_data/pos_reviews_test",
-           "model_path": "saves/Apr-27-2020_21-10-49/model_1epochs",
-            "label": "positive",
-            "truncation": "head-and-tail"
-        },
-
-
-        # imdb test sentences
         # {
-        #     "file": "/data/madhu/imdb_dataset/processed_data/neg_test_reviews_10000sents",
-        #     "model_path": "saves/Apr-27-2020_21-10-49/model_1epochs",
+        #     "file": "/data/madhu/imdb_dataset/processed_data/neg_reviews_test",
+        #    "model_path": "saves/imdb_reviews_full_lr1e-05/model_1epochs",
         #     "label": "negative",
         #     "truncation": "head-and-tail",            
         # },
         # {
-        #     "file": "/data/madhu/imdb_dataset/processed_data/pos_test_reviews_10000sents",
-        #     "model_path": "saves/Apr-27-2020_21-10-49/model_1epochs",
+        #     "file": "/data/madhu/imdb_dataset/processed_data/pos_reviews_test",
+        #    "model_path": "saves/imdb_reviews_full_lr1e-05/model_1epochs",
         #     "label": "positive",
         #     "truncation": "head-and-tail"
-        # }
+        # },
+
+
+        # imdb test same review sentences
+        # {
+        #     "file": "/data/madhu/imdb_dataset/processed_data/neg_test_reviews_same_review_sents_10k",
+        #     "model_path": "saves/imdb_reviews_full_lr1e-05/model_1epochs",
+        #     "label": "negative",
+        #     "truncation": "head-and-tail"
+        # },
+        # {
+        #     "file": "/data/madhu/imdb_dataset/processed_data/pos_test_reviews_same_review_sents_10k",
+        #    "model_path": "saves/imdb_reviews_full_lr1e-05/model_1epochs",
+        #     "label": "positive",
+        #     "truncation": "head-and-tail"
+        # },
+
+
+        # imdb test sentences
+        {
+            "file": "/data/madhu/imdb_dataset/processed_data/neg_test_reviews_10000sents",
+            "model_path": "saves/imdb_reviews_full_lr1e-05/model_1epochs",
+            "label": "negative",
+            "truncation": "head-and-tail",            
+        },
+        {
+            "file": "/data/madhu/imdb_dataset/processed_data/pos_test_reviews_10000sents",
+            "model_path": "saves/imdb_reviews_full_lr1e-05/model_1epochs",
+            "label": "positive",
+            "truncation": "head-and-tail"
+        }
     ]
-    seed_vals = [23]
+    seed_vals = [230]
     for args in testfiles:
         for seed_val in seed_vals:    
             iprint(f"Details: {args}")
