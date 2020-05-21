@@ -8,6 +8,10 @@ import time
 from datetime import datetime
 import logging
 from pathlib import Path
+import spacy
+import random
+
+nlp = spacy.load("en_core_web_md")
 
 def get_filename(time: int, util_name:str =""):   
     # print(args)    
@@ -35,12 +39,12 @@ def get_device(device_no: int):
     
     return device
 
-def read_samples(filename0: str, filename1: str, seed_val:int, n_samples:int = None):
+def read_samples(filename0: str, filename1: str, seed_val:int, n_samples:int = None, sentence_flag:bool=False):
     yelp_reviews_0 = []
     yelp_reviews_1 = []
     with open(filename0, "r") as f:
-        yelp_reviews_0 = f.readlines()
-        
+        yelp_reviews_0 = f.read().splitlines()        
+
     with open(filename1, "r") as f:
         yelp_reviews_1 = f.readlines()
 
@@ -50,6 +54,9 @@ def read_samples(filename0: str, filename1: str, seed_val:int, n_samples:int = N
     reviews = []
     labels = []
     if n_samples != None:
+        if min(len(yelp_reviews_0), len(yelp_reviews_1)) < n_samples:
+            n_samples = min(len(yelp_reviews_0), len(yelp_reviews_1))
+
         indices = np.random.choice(np.arange(len(yelp_reviews_0)), size=n_samples)
         yelp_reviews_0_new = [yelp_reviews_0[idx] for idx in indices]
 
@@ -64,3 +71,34 @@ def read_samples(filename0: str, filename1: str, seed_val:int, n_samples:int = N
     reviews = [rev.lower() for rev in reviews]
     return reviews, labels
 
+def read_samples_new_util(filename, n_samples, sentence_flag):
+    data = []
+    with open(filename, "r") as f:
+        reviews = f.read().splitlines()
+        if n_samples == None:
+            n_samples = sys.maxsize
+        random.shuffle(reviews)
+        for rev in reviews:            
+            if sentence_flag:
+                doc = nlp(rev)
+                for sent in doc.sents:
+                    data.append(sent.string)
+                    if len(data) >= n_samples:
+                        break
+                if len(data) >= n_samples:
+                    break
+            else:
+                data.append(rev)                
+            if len(data) >= n_samples:
+                break
+        return data
+
+def read_samples_new(filename0: str, filename1: str, seed_val:int, n_samples:int = None, sentence_flag:bool=False):
+    seed_val = 23
+    random.seed(seed_val)
+    reviews_0 = read_samples_new_util(filename0, n_samples, sentence_flag)
+    reviews_1 = read_samples_new_util(filename1, n_samples, sentence_flag)
+    labels = [0]*len(reviews_0) + [1]*len(reviews_1)
+    reviews = reviews_0+reviews_1
+    reviews = [rev.lower() for rev in reviews]
+    return reviews, labels

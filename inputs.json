@@ -1,0 +1,61 @@
+[ 
+    {
+        "pos_file": "/data/madhu/yelp/shen_et_al_data/sentiment.train.1",
+        "neg_file": "/data/madhu/yelp/shen_et_al_data/sentiment.train.0",
+        "truncation": "head-and-tail",
+        "n_samples": 20000
+    }, 
+    
+    {
+        "pos_file": "/data/madhu/yelp/yelp_processed_data/review.1_train",
+        "neg_file": "/data/madhu/yelp/yelp_processed_data/review.0_train",
+        "truncation": "head-and-tail",
+        "n_samples": 25000
+    },                
+    {
+        "pos_file": "/data/madhu/imdb_dataset/processed_data/pos_reviews_train",
+        "neg_file": "/data/madhu/imdb_dataset/processed_data/neg_reviews_train",
+        "truncation": "head-and-tail"
+    },  
+    {
+        "pos_file": "/data/madhu/imdb_dataset/processed_data/pos_reviews_train",
+        "neg_file": "/data/madhu/imdb_dataset/processed_data/neg_reviews_train",
+        "truncation": "tail-only"
+    },  
+    {
+        "pos_file": "/data/madhu/tripadvisor/processed_data/pos_reviews_train",
+        "neg_file": "/data/madhu/tripadvisor/processed_data/neg_reviews_train",
+        "truncation": "head-and-tail",
+        "n_samples": 25000
+    },  
+    {
+        "pos_file": "/data/madhu/amazon-reviews-2018/processed_data/automotive/pos_reviews_train",
+        "neg_file": "/data/madhu/amazon-reviews-2018/processed_data/automotive/neg_reviews_train",
+        "truncation": "head-and-tail",
+        "n_samples": 25000
+    },   
+    {
+        "pos_file": "/data/madhu/amazon-reviews-2018/processed_data/sports_and_outdoors/pos_reviews_train",
+        "neg_file": "/data/madhu/amazon-reviews-2018/processed_data/sports_and_outdoors/neg_reviews_train",
+        "truncation": "head-and-tail",
+        "n_samples": 25000
+    },   
+    {
+        "pos_file": "/data/madhu/amazon-reviews-2018/processed_data/cellphones_and_accessories/pos_reviews_train",
+        "neg_file": "/data/madhu/amazon-reviews-2018/processed_data/cellphones_and_accessories/neg_reviews_train",
+        "truncation": "head-and-tail",
+        "n_samples": 25000
+    },   
+    {
+        "pos_file": "/data/madhu/amazon-reviews-2018/processed_data/luxury_beauty/pos_reviews_train",
+        "neg_file": "/data/madhu/amazon-reviews-2018/processed_data/luxury_beauty/neg_reviews_train",
+        "truncation": "head-and-tail",
+        "n_samples": 25000
+    },   
+    {
+        "pos_file": "/data/madhu/amazon-reviews-2018/processed_data/pet_supplies/pos_reviews_train",
+        "neg_file": "/data/madhu/amazon-reviews-2018/processed_data/pet_supplies/neg_reviews_train",
+        "truncation": "head-and-tail",
+        "n_samples": 25000
+    }
+]

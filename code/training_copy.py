@@ -14,7 +14,6 @@ import util
 import datetime
 import logging
 from torch import nn
-import argparse
 
 # Function to calculate the accuracy of our predictions vs labels
 def flat_accuracy(preds, labels):
@@ -33,13 +32,9 @@ def format_time(elapsed):
     return str(datetime.timedelta(seconds=elapsed_rounded))
 
 
-def train_model(args: dict, hparams:dict):
-    pos_file = args.pos_file
-    neg_file = args.neg_file
-    truncation = args.truncation
-    n_samples = args.n_samples
-    seed_val = hparams["seed_val"]
-    device = util.get_device(device_no=args.device_no)
+def train_model(pos_file:str, neg_file:str, args: dict, truncation:str, n_samples:int=None):
+    seed_val = args["seed_val"]
+    device = util.get_device(device_no=2)
     saves_dir = "saves/"
 
     Path(saves_dir).mkdir(parents=True, exist_ok=True)   
@@ -67,7 +62,6 @@ def train_model(args: dict, hparams:dict):
     # reviews, labels = util.read_samples(filename0=neg_file, filename1=pos_file, seed_val=seed_val, n_samples=n_samples)
     reviews, labels = util.read_samples_new(filename0=neg_file, filename1=pos_file, 
         seed_val=seed_val, n_samples=n_samples, sentence_flag=True)
-    print(len(reviews), len(labels))
     
     # For every sentence...
     # for rev in reviews:
@@ -146,7 +140,7 @@ def train_model(args: dict, hparams:dict):
     # The DataLoader needs to know our batch size for training, so we specify it 
     # here. For fine-tuning BERT on a specific task, the authors recommend a batch 
     # size of 16 or 32.
-    batch_size = hparams["batch_size"]
+    batch_size = args["batch_size"]
 
     # Create the DataLoaders for our training and validation sets.
     # We'll take training samples in random order. 
@@ -174,21 +168,15 @@ def train_model(args: dict, hparams:dict):
         output_attentions = False, # Whether the model returns attentions weights.
         output_hidden_states = False, # Whether the model returns all hidden-states.        
     )
-    # if torch.cuda.device_count() > 1:
-    #     print("Let's use", torch.cuda.device_count(), "GPUs!")
-    #     # dim = 0 [30, xxx] -> [10, ...], [10, ...], [10, ...] on 3 GPUs
-    #     model = nn.DataParallel(model, device_ids=[1,2,3])    
-
     # model.classifier = nn.Linear(args["final_hidden_size"], model.config.num_labels)
     # Tell pytorch to run this model on the GPU.
-    model = model.to(device=device)
-    # model.cuda(device=device)
+    model.cuda(device=device)
 
     # Note: AdamW is a class from the huggingface library (as opposed to pytorch) 
     # I believe the 'W' stands for 'Weight Decay fix"
     optimizer = AdamW(model.parameters(),
-                    lr = hparams["learning_rate"], # args.learning_rate - default is 5e-5, our notebook had 2e-5
-                    eps = hparams["adam_epsilon"] # args.adam_epsilon  - default is 1e-8.
+                    lr = args["learning_rate"], # args.learning_rate - default is 5e-5, our notebook had 2e-5
+                    eps = args["adam_epsilon"] # args.adam_epsilon  - default is 1e-8.
                     )
 
     # Number of training epochs. The BERT authors recommend between 2 and 4. 
@@ -292,7 +280,7 @@ def train_model(args: dict, hparams:dict):
             # calculate the average loss at the end. `loss` is a Tensor containing a
             # single value; the `.item()` function just returns the Python value 
             # from the tensor.
-            total_train_loss += loss.detach().cpu().numpy()
+            total_train_loss += loss.item()
 
             # Perform a backward pass to calculate the gradients.
             loss.backward()
@@ -374,7 +362,7 @@ def train_model(args: dict, hparams:dict):
                                     labels=b_labels)
                 
             # Accumulate the validation loss.
-            total_eval_loss += loss.detach().cpu().numpy()
+            total_eval_loss += loss.item()
 
             # Move logits and labels to CPU
             logits = logits.detach().cpu().numpy()
@@ -422,37 +410,70 @@ def train_model(args: dict, hparams:dict):
     # print("Total training took {:} (h:mm:ss)".format(format_time(time.time()-total_t0)))
 
 
-if __name__=="__main__":   
-    parser = argparse.ArgumentParser()
+if __name__=="__main__":
+    files = [   
+        # {
+        #     "pos_file": "/data/madhu/yelp/shen_et_al_data/sentiment.train.1",
+        #     "neg_file": "/data/madhu/yelp/shen_et_al_data/sentiment.train.0",
+        #     "truncation": "head-and-tail",
+        #     "n_samples": 20000
+        # }, 
+        #    
+        # {
+        #     "pos_file": "/data/madhu/yelp/yelp_processed_data/review.1_train",
+        #     "neg_file": "/data/madhu/yelp/yelp_processed_data/review.0_train",
+        #     "truncation": "head-and-tail",
+        #     "n_samples": 25000
+        # },                
+        # {
+        #     "pos_file": "/data/madhu/imdb_dataset/processed_data/pos_reviews_train",
+        #     "neg_file": "/data/madhu/imdb_dataset/processed_data/neg_reviews_train",
+        #     "truncation": "head-and-tail"
+        # },  
+        # {
+        #     "pos_file": "/data/madhu/imdb_dataset/processed_data/pos_reviews_train",
+        #     "neg_file": "/data/madhu/imdb_dataset/processed_data/neg_reviews_train",
+        #     "truncation": "tail-only"
+        # },  
+        # {
+        #     "pos_file": "/data/madhu/tripadvisor/processed_data/pos_reviews_train",
+        #     "neg_file": "/data/madhu/tripadvisor/processed_data/neg_reviews_train",
+        #     "truncation": "head-and-tail",
+        #     "n_samples": 25000
+        # },  
+        # {
+        #     "pos_file": "/data/madhu/amazon-reviews-2018/processed_data/automotive/pos_reviews_train",
+        #     "neg_file": "/data/madhu/amazon-reviews-2018/processed_data/automotive/neg_reviews_train",
+        #     "truncation": "head-and-tail",
+        #     "n_samples": 25000
+        # },   
+        # {
+        #     "pos_file": "/data/madhu/amazon-reviews-2018/processed_data/sports_and_outdoors/pos_reviews_train",
+        #     "neg_file": "/data/madhu/amazon-reviews-2018/processed_data/sports_and_outdoors/neg_reviews_train",
+        #     "truncation": "head-and-tail",
+        #     "n_samples": 25000
+        # },   
+        # {
+        #     "pos_file": "/data/madhu/amazon-reviews-2018/processed_data/cellphones_and_accessories/pos_reviews_train",
+        #     "neg_file": "/data/madhu/amazon-reviews-2018/processed_data/cellphones_and_accessories/neg_reviews_train",
+        #     "truncation": "head-and-tail",
+        #     "n_samples": 25000
+        # },   
+        # {
+        #     "pos_file": "/data/madhu/amazon-reviews-2018/processed_data/luxury_beauty/pos_reviews_train",
+        #     "neg_file": "/data/madhu/amazon-reviews-2018/processed_data/luxury_beauty/neg_reviews_train",
+        #     "truncation": "head-and-tail",
+        #     "n_samples": 25000
+        # },   
+        # {
+        #     "pos_file": "/data/madhu/amazon-reviews-2018/processed_data/pet_supplies/pos_reviews_train",
+        #     "neg_file": "/data/madhu/amazon-reviews-2018/processed_data/pet_supplies/neg_reviews_train",
+        #     "truncation": "head-and-tail",
+        #     "n_samples": 25000
+        # },    
+    ]
 
-    ## Required parameters
-    parser.add_argument("--pos_file",
-                        default=None,
-                        type=str,
-                        required=True,
-                        help="")
-    parser.add_argument("--neg_file",
-                        default=None,
-                        type=str,
-                        required=True,
-                        help="")
-    parser.add_argument("--truncation",
-                        default=None,
-                        type=str,
-                        required=True,
-                        help="")
-    parser.add_argument("--n_samples",
-                        default=None,
-                        type=int,
-                        help="")
-    parser.add_argument("--device_no",
-                        default=0,
-                        type=int,
-                        help="")
-    
-    args = parser.parse_args()
-
-    hyperparams = [       
+    args = [       
         {
             "learning_rate": 2e-5,
             "batch_size": 8,
@@ -467,10 +488,12 @@ if __name__=="__main__":
         # },        
     ]
 
-    for hparams in hyperparams:         
-        print(args)    
-        print(hparams)       
-        train_model(args, hparams)
-        
+    for f in files:
+        for params in args:            
+            if "n_samples" in f:
+                train_model(f["pos_file"], f["neg_file"], params, f["truncation"], f["n_samples"])
+            else:
+                train_model(f["pos_file"], f["neg_file"], params, f["truncation"])
+    
 
     

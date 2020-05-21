@@ -1,0 +1,302 @@
+[
+
+        # yelp_shen_et_al test reviews
+        # {
+        #     "file": "/data/madhu/yelp/shen_et_al_data/sentiment.test.0",
+        #     "model_path": "saves/shen_et_al-head_and_tail/model_2epochs",
+        #     "label": "negative",
+        #     "truncation": "head-and-tail"
+        # },
+        # {
+        #     "file": "/data/madhu/yelp/shen_et_al_data/sentiment.test.1",
+        #     "model_path": "saves/shen_et_al-head_and_tail/model_2epochs",
+        #     "label": "positive",
+        #     "truncation": "head-and-tail"
+        # },
+
+
+        # yelp_original test reviews        
+        {
+            "file": "/data/madhu/yelp/yelp_processed_data/review.1_test",
+            "model_path": "saves/yelp-reviews/model_2epochs",
+            "label": "positive",
+            "truncation": "head-and-tail",
+            "n_samples": 5000
+        },
+        {
+            "file": "/data/madhu/yelp/yelp_processed_data/review.0_test",
+            "model_path": "saves/yelp-reviews/model_2epochs",
+            "label": "negative",
+            "truncation": "head-and-tail",
+            "n_samples": 5000
+        },
+
+        #  yelp_original test sentences
+        {
+            "file": "/data/madhu/yelp/yelp_processed_data/review.1_test_50k_sents",
+            "model_path": "saves/yelp-reviews/model_2epochs",
+            "label": "positive",
+            "truncation": "head-and-tail",
+            "n_samples": 5000
+        },
+        {
+            "file": "/data/madhu/yelp/yelp_processed_data/review.0_test_50k_sents",
+            "model_path": "saves/yelp-reviews/model_2epochs",
+            "label": "negative",
+            "truncation": "head-and-tail",
+            "n_samples": 5000
+        },
+        
+            
+
+        # imdb test reviews
+        {
+            "file": "/data/madhu/imdb_dataset/processed_data/pos_reviews_test",
+           "model_path": "saves/imdb/model_2epochs",
+            "label": "positive",
+            "truncation": "head-and-tail"
+        },
+        {
+            "file": "/data/madhu/imdb_dataset/processed_data/neg_reviews_test",
+           "model_path": "saves/imdb/model_2epochs",
+            "label": "negative",
+            "truncation": "head-and-tail",            
+        },
+        
+
+
+        # imdb test same review sentences
+        {
+            "file": "/data/madhu/imdb_dataset/processed_data/pos_test_reviews_same_review_sents_10k",
+           "model_path": "saves/imdb/model_2epochs",
+            "label": "positive",
+            "truncation": "head-and-tail"
+        },
+        {
+            "file": "/data/madhu/imdb_dataset/processed_data/neg_test_reviews_same_review_sents_10k",
+            "model_path": "saves/imdb/model_2epochs",
+            "label": "negative",
+            "truncation": "head-and-tail"
+        },
+        
+
+
+        # imdb test sentences
+        {
+            "file": "/data/madhu/imdb_dataset/processed_data/pos_test_reviews_100000sents",
+            "model_path": "saves/imdb/model_2epochs",
+            "label": "positive",
+            "truncation": "head-and-tail",
+            "n_samples": 10000
+        }, 
+        {
+            "file": "/data/madhu/imdb_dataset/processed_data/neg_test_reviews_100000sents",
+            "model_path": "saves/imdb/model_2epochs",
+            "label": "negative",
+            "truncation": "head-and-tail",
+            "n_samples": 10000
+        },
+        
+
+        # Tripadvisor test reviews
+        {
+            "file": "/data/madhu/tripadvisor/processed_data/pos_reviews_test",
+            "model_path": "saves/tripadvisor/model_2epochs",
+            "label": "positive",
+            "truncation": "head-and-tail",
+            "n_samples": 10000
+        },
+        {
+            "file": "/data/madhu/tripadvisor/processed_data/neg_reviews_test",
+            "model_path": "saves/tripadvisor/model_2epochs",
+            "label": "negative",
+            "truncation": "head-and-tail",
+            "n_samples": 10000
+        },
+
+        # Tripadvisor test sentences
+        {
+            "file": "/data/madhu/tripadvisor/processed_data/pos_sents_test",
+            "model_path": "saves/tripadvisor/model_2epochs",
+            "label": "positive",
+            "truncation": "head-and-tail",
+            "n_samples": 10000
+        },
+        {
+            "file": "/data/madhu/tripadvisor/processed_data/neg_sents_test",
+            "model_path": "saves/tripadvisor/model_2epochs",
+            "label": "negative",
+            "truncation": "head-and-tail",
+            "n_samples": 10000
+        },
+
+        # # Cellphones test reviews
+        # {
+        #     "file": "/data/madhu/amazon-reviews-2018/processed_data/cellphones_and_accessories/pos_reviews_test",
+        #     "model_path": "saves/cellphones_and_accessories/model_2epochs",
+        #     "label": "positive",
+        #     "truncation": "head-and-tail",
+        #     "n_samples": 10000
+        # },
+        # {
+        #     "file": "/data/madhu/amazon-reviews-2018/processed_data/cellphones_and_accessories/neg_reviews_test",
+        #     "model_path": "saves/cellphones_and_accessories/model_2epochs",
+        #     "label": "negative",
+        #     "truncation": "head-and-tail",
+        #     "n_samples": 10000
+        # },
+
+
+        # # Cellphones test sentences
+        #  {
+        #     "file": "/data/madhu/amazon-reviews-2018/processed_data/cellphones_and_accessories/pos_sents_test",
+        #     "model_path": "saves/cellphones_and_accessories/model_2epochs",
+        #     "label": "positive",
+        #     "truncation": "head-and-tail",
+        #     "n_samples": 10000
+        # },
+        # {
+        #     "file": "/data/madhu/amazon-reviews-2018/processed_data/cellphones_and_accessories/neg_sents_test",
+        #     "model_path": "saves/cellphones_and_accessories/model_2epochs",
+        #     "label": "negative",
+        #     "truncation": "head-and-tail",
+        #     "n_samples": 10000
+        # },
+
+
+        # # Luxury beauty test reviews
+        # {
+        #     "file": "/data/madhu/amazon-reviews-2018/processed_data/luxury_beauty/pos_reviews_test",
+        #     "model_path": "saves/luxury_beauty/model_1epochs",
+        #     "label": "positive",
+        #     "truncation": "head-and-tail",
+        #     "n_samples": 10000
+        # },
+        # {
+        #     "file": "/data/madhu/amazon-reviews-2018/processed_data/luxury_beauty/neg_reviews_test",
+        #     "model_path": "saves/luxury_beauty/model_1epochs",
+        #     "label": "negative",
+        #     "truncation": "head-and-tail",
+        #     "n_samples": 10000
+        # },
+
+
+        # # Luxury beauty test sentences
+        # {
+        #     "file": "/data/madhu/amazon-reviews-2018/processed_data/luxury_beauty/pos_sents_test",
+        #     "model_path": "saves/luxury_beauty/model_1epochs",
+        #     "label": "positive",
+        #     "truncation": "head-and-tail",
+        #     "n_samples": 10000
+        # },
+        # {
+        #     "file": "/data/madhu/amazon-reviews-2018/processed_data/luxury_beauty/neg_sents_test",
+        #     "model_path": "saves/luxury_beauty/model_1epochs",
+        #     "label": "negative",
+        #     "truncation": "head-and-tail",
+        #     "n_samples": 10000
+        # },
+
+
+        # # Pet supplies test reviews
+        # {
+        #     "file": "/data/madhu/amazon-reviews-2018/processed_data/pet_supplies/pos_reviews_test",
+        #     "model_path": "saves/pet_supplies/model_2epochs",
+        #     "label": "positive",
+        #     "truncation": "head-and-tail",
+        #     "n_samples": 10000
+        # },
+        # {
+        #     "file": "/data/madhu/amazon-reviews-2018/processed_data/pet_supplies/neg_reviews_test",
+        #     "model_path": "saves/pet_supplies/model_2epochs",
+        #     "label": "negative",
+        #     "truncation": "head-and-tail",
+        #     "n_samples": 10000
+        # },
+
+
+        # # Pet supplies test sentences
+        # {
+        #     "file": "/data/madhu/amazon-reviews-2018/processed_data/pet_supplies/pos_sents_test",
+        #     "model_path": "saves/pet_supplies/model_2epochs",
+        #     "label": "positive",
+        #     "truncation": "head-and-tail",
+        #     "n_samples": 10000
+        # },
+        # {
+        #     "file": "/data/madhu/amazon-reviews-2018/processed_data/pet_supplies/neg_sents_test",
+        #     "model_path": "saves/pet_supplies/model_2epochs",
+        #     "label": "negative",
+        #     "truncation": "head-and-tail",
+        #     "n_samples": 10000
+        # },
+
+
+        # # Sports and Outdoors test reviews
+        # {
+        #     "file": "/data/madhu/amazon-reviews-2018/processed_data/sports_and_outdoors/pos_reviews_test",
+        #     "model_path": "saves/sports_and_outdoors/model_2epochs",
+        #     "label": "positive",
+        #     "truncation": "head-and-tail",
+        #     "n_samples": 10000
+        # },
+        # {
+        #     "file": "/data/madhu/amazon-reviews-2018/processed_data/sports_and_outdoors/neg_reviews_test",
+        #     "model_path": "saves/sports_and_outdoors/model_2epochs",
+        #     "label": "negative",
+        #     "truncation": "head-and-tail",
+        #     "n_samples": 10000
+        # },
+
+
+        # # Sports and Outdoors test sentences
+        # {
+        #     "file": "/data/madhu/amazon-reviews-2018/processed_data/sports_and_outdoors/pos_sents_test",
+        #     "model_path": "saves/sports_and_outdoors/model_2epochs",
+        #     "label": "positive",
+        #     "truncation": "head-and-tail",
+        #     "n_samples": 10000
+        # },
+        # {
+        #     "file": "/data/madhu/amazon-reviews-2018/processed_data/sports_and_outdoors/neg_sents_test",
+        #     "model_path": "saves/sports_and_outdoors/model_2epochs",
+        #     "label": "negative",
+        #     "truncation": "head-and-tail",
+        #     "n_samples": 10000
+        # },
+
+
+        # # Automotive test reviews
+        # {
+        #     "file": "/data/madhu/amazon-reviews-2018/processed_data/automotive/pos_reviews_test",
+        #     "model_path": "saves/automotive/model_2epochs",
+        #     "label": "positive",
+        #     "truncation": "head-and-tail",
+        #     "n_samples": 10000
+        # },
+        # {
+        #     "file": "/data/madhu/amazon-reviews-2018/processed_data/automotive/neg_reviews_test",
+        #     "model_path": "saves/automotive/model_2epochs",
+        #     "label": "negative",
+        #     "truncation": "head-and-tail",
+        #     "n_samples": 10000
+        # },
+
+
+        # # Automotive test sentences
+        # {
+        #     "file": "/data/madhu/amazon-reviews-2018/processed_data/automotive/pos_sents_test",
+        #     "model_path": "saves/automotive/model_2epochs",
+        #     "label": "positive",
+        #     "truncation": "head-and-tail",
+        #     "n_samples": 10000
+        # },
+        # {
+        #     "file": "/data/madhu/amazon-reviews-2018/processed_data/automotive/neg_sents_test",
+        #     "model_path": "saves/automotive/model_2epochs",
+        #     "label": "negative",
+        #     "truncation": "head-and-tail",
+        #     "n_samples": 10000
+        # },
+    ]
+    

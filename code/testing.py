@@ -10,18 +10,20 @@ import numpy as np
 import time
 import random
 from pathlib import Path
-import utils
+import util
 import datetime
 import logging
 import pprint
+import pandas as pd
+import argparse
 
 pp = pprint.PrettyPrinter(indent=4)
 iprint = pp.pprint
 
 def test(args: dict(), save_flag: bool, seed_val):
-    model = torch.load(args["model_path"])
-    device = utils.get_device(device_no=2)   
     
+    device = util.get_device(device_no=args.device_no)   
+    model = torch.load(args.model_path, map_location=device)
     # seed_val = 2346610
 
     random.seed(seed_val)
@@ -29,16 +31,16 @@ def test(args: dict(), save_flag: bool, seed_val):
     torch.manual_seed(seed_val)
     torch.cuda.manual_seed_all(seed_val)
     
-    testfile = args["file"]
-    true_label = args["label"]
-    truncation = args["truncation"]
+    testfile = args.input_file
+    true_label = args.label
+    truncation = args.truncation
     n_samples = None
     if "n_samples" in args:
-        n_samples = args["n_samples"]
+        n_samples = args.n_samples
 
     # saves_dir = "saves/"  
     # time = datetime.datetime.now()
-    # saves_path = os.path.join(saves_dir, utils.get_filename(time))
+    # saves_path = os.path.join(saves_dir, util.get_filename(time))
     # if save_flag:
     #     Path(saves_path).mkdir(parents=True, exist_ok=True)
 
@@ -170,116 +172,94 @@ def test(args: dict(), save_flag: bool, seed_val):
 
 if __name__=="__main__":
 
-    testfiles = [
+    parser = argparse.ArgumentParser()
 
-        # yelp_shen_et_al test reviews
-        # {
-        #     "file": "/data/madhu/yelp/shen_et_al_data/sentiment.test.0",
-        #     "model_path": "saves/shen_et_al-head_and_tail/model_2epochs",
-        #     "label": "negative",
-        #     "truncation": "head-and-tail"
-        # },
-        # {
-        #     "file": "/data/madhu/yelp/shen_et_al_data/sentiment.test.1",
-        #     "model_path": "saves/shen_et_al-head_and_tail/model_2epochs",
-        #     "label": "positive",
-        #     "truncation": "head-and-tail"
-        # },
+    ## Required parameters
+    parser.add_argument("--input_file",
+                        default=None,
+                        type=str,
+                        required=True,
+                        help="")
+    parser.add_argument("--model_path",
+                        default=None,
+                        type=str,
+                        required=True,
+                        help="")
+    parser.add_argument("--truncation",
+                        default=None,
+                        type=str,
+                        required=True,
+                        help="")
+    parser.add_argument("--label",
+                        default=None,
+                        type=str,
+                        required=True,
+                        help="")
+    parser.add_argument("--n_samples",
+                        default=None,
+                        type=int,
+                        help="")
+    parser.add_argument("--device_no",
+                        default=2,
+                        type=int,
+                        help="")
+    
+    args = parser.parse_args()
+    
+    pd.set_option('display.max_rows', None)
+    pd.set_option('display.max_columns', None)
+    pd.set_option('display.width', None)
+    pd.set_option('display.max_colwidth', -1)
 
+    seed_vals = [23]
+    accuracies_df = pd.DataFrame(columns=['dataset', 'seed_val', 'accuracy', 'score'])
 
-        # yelp_original test reviews
-        # {
-        #     "file": "/data/madhu/yelp/yelp_processed_data/review.0_test",
-        #     "model_path": "saves/yelp-original-head-and-tail/model_2epochs",
-        #     "label": "negative",
-        #     "truncation": "head-and-tail",
-        #     "n_samples": 5000
-        # },
-        # {
-        #     "file": "/data/madhu/yelp/yelp_processed_data/review.1_test",
-        #     "model_path": "saves/yelp-original-head-and-tail/model_2epochs",
-        #     "label": "positive",
-        #     "truncation": "head-and-tail",
-        #     "n_samples": 5000
-        # },
+    iprint(f"Args: {args}")
+    for seed_val in seed_vals:    
+        iprint(f"seed val: {seed_val}")
+        preds, true_labels = test(args, False, seed_val)
+        # Combine the results across all batches. 
+        flat_predictions = np.concatenate(preds, axis=0)
 
-        #  yelp_original test sentences
-        # {
-        #     "file": "/data/madhu/yelp/yelp_processed_data/review.0_test_50k_sents",
-        #     "model_path": "saves/yelp-original-head-and-tail/model_2epochs",
-        #     "label": "negative",
-        #     "truncation": "head-and-tail",
-        #     "n_samples": 5000
-        # },
-        # {
-        #     "file": "/data/madhu/yelp/yelp_processed_data/review.1_test_50k_sents",
-        #     "model_path": "saves/yelp-original-head-and-tail/model_2epochs",
-        #     "label": "positive",
-        #     "truncation": "head-and-tail",
-        #     "n_samples": 5000
-        # },
-            
+        # For each sample, pick the label (0 or 1) with the higher score.
+        flat_predictions = np.argmax(flat_predictions, axis=1).flatten()
 
-        # imdb test reviews
-        # {
-        #     "file": "/data/madhu/imdb_dataset/processed_data/neg_reviews_test",
-        #    "model_path": "saves/imdb_reviews_full_lr1e-05/model_1epochs",
-        #     "label": "negative",
-        #     "truncation": "head-and-tail",            
-        # },
-        # {
-        #     "file": "/data/madhu/imdb_dataset/processed_data/pos_reviews_test",
-        #    "model_path": "saves/imdb_reviews_full_lr1e-05/model_1epochs",
-        #     "label": "positive",
-        #     "truncation": "head-and-tail"
-        # },
+        # Combine the correct labels for each batch into a single list.
+        flat_true_labels = np.concatenate(true_labels, axis=0)
+        accuracy = 1.0*(np.sum(flat_predictions == flat_true_labels))/flat_predictions.shape[0]        
+        score = 0
 
+        if args.label == "positive":
+            correct_count = np.sum(flat_predictions == flat_true_labels)
+            total_count = flat_predictions.shape[0]
+            TPR = 1.0*correct_count/total_count
+            FNR = 1.0*(total_count-correct_count)/total_count
+            score = accuracy*TPR+(1-accuracy)*FNR
+            true_rate = TPR
+            false_rate = FNR
 
-        # imdb test same review sentences
-        # {
-        #     "file": "/data/madhu/imdb_dataset/processed_data/neg_test_reviews_same_review_sents_10k",
-        #     "model_path": "saves/imdb_reviews_full_lr1e-05/model_1epochs",
-        #     "label": "negative",
-        #     "truncation": "head-and-tail"
-        # },
-        # {
-        #     "file": "/data/madhu/imdb_dataset/processed_data/pos_test_reviews_same_review_sents_10k",
-        #    "model_path": "saves/imdb_reviews_full_lr1e-05/model_1epochs",
-        #     "label": "positive",
-        #     "truncation": "head-and-tail"
-        # },
+        elif args.label == "negative":
+            correct_count = np.sum(flat_predictions == flat_true_labels)
+            total_count = flat_predictions.shape[0]
+            TNR = 1.0*correct_count/total_count
+            FPR = 1.0*(total_count-correct_count)/total_count
+            score = accuracy*TNR+(1-accuracy)*FPR
+            true_rate = TNR
+            false_rate = FPR
 
+        accuracies_df = accuracies_df.append({
+            "dataset": args.input_file,
+            "seed_val": seed_val,
+            "accuracy": accuracy,
+            "correct_count": correct_count,
+            "total_count": total_count,
+            "true_rate": true_rate,
+            "false_rate": false_rate
+        }, ignore_index=True)
+        
+        iprint(f"Accuracy: {accuracy}")
+        # iprint(f"Score: {score}")
 
-        # imdb test sentences
-        {
-            "file": "/data/madhu/imdb_dataset/processed_data/neg_test_reviews_10000sents",
-            "model_path": "saves/imdb_reviews_full_lr1e-05/model_1epochs",
-            "label": "negative",
-            "truncation": "head-and-tail",            
-        },
-        {
-            "file": "/data/madhu/imdb_dataset/processed_data/pos_test_reviews_10000sents",
-            "model_path": "saves/imdb_reviews_full_lr1e-05/model_1epochs",
-            "label": "positive",
-            "truncation": "head-and-tail"
-        }
-    ]
-    seed_vals = [230]
-    for args in testfiles:
-        for seed_val in seed_vals:    
-            iprint(f"Details: {args}")
-            iprint(f"seed val: {seed_val}")
-            preds, true_labels = test(args, False, seed_val)
-            # Combine the results across all batches. 
-            flat_predictions = np.concatenate(preds, axis=0)
-
-            # For each sample, pick the label (0 or 1) with the higher score.
-            flat_predictions = np.argmax(flat_predictions, axis=1).flatten()
-
-            # Combine the correct labels for each batch into a single list.
-            flat_true_labels = np.concatenate(true_labels, axis=0)
-
-            accuracy = 1.0*(np.sum(flat_predictions == flat_true_labels))/flat_predictions.shape[0]
-            iprint(f"Accuracy: {accuracy}")
+    print(accuracies_df)
 
     
