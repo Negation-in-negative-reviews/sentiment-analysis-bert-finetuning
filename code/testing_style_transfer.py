@@ -17,10 +17,13 @@ import pprint
 import pandas as pd
 import argparse
 import pickle
-from pathlib import Path
+import vader_negation_util
+import spacy
 
 pp = pprint.PrettyPrinter(indent=4)
 iprint = pp.pprint
+
+nlp = spacy.load("en_core_web_md")
 
 def test(args: dict(), save_flag: bool, seed_val):
     
@@ -33,7 +36,7 @@ def test(args: dict(), save_flag: bool, seed_val):
     torch.manual_seed(seed_val)
     torch.cuda.manual_seed_all(seed_val)
     
-    testfile = args.input_file
+    testfile = args.output_file
     true_label = args.label
     truncation = args.truncation
     n_samples = None
@@ -182,6 +185,11 @@ if __name__=="__main__":
                         type=str,
                         required=True,
                         help="")
+    parser.add_argument("--output_file",
+                        default=None,
+                        type=str,
+                        required=True,
+                        help="")
     parser.add_argument("--model_path",
                         default=None,
                         type=str,
@@ -197,17 +205,17 @@ if __name__=="__main__":
                         type=str,
                         required=True,
                         help="")
-    parser.add_argument("--name",
-                        default=None,
-                        type=str,
-                        required=True,
-                        help="")
+    # parser.add_argument("--name",
+    #                     default=None,
+    #                     type=str,
+    #                     required=True,
+    #                     help="")
     parser.add_argument("--n_samples",
                         default=None,
                         type=int,
                         help="")
     parser.add_argument("--device_no",
-                        default=2,
+                        default=1,
                         type=int,
                         help="")
     
@@ -222,13 +230,24 @@ if __name__=="__main__":
     accuracies_df = pd.DataFrame(columns=['dataset', 'seed_val', 'accuracy', 'score'])
 
     iprint(f"Args: {args}")
+    input_reviews = util.read_file(args.input_file)
+    
+    vader_sentiment_scores = vader_negation_util.read_vader_sentiment_dict()
+
     for seed_val in seed_vals:    
         iprint(f"seed val: {seed_val}")
-        preds, true_labels, reviews = test(args, False, seed_val)
+        preds, true_labels, translated_reviews = test(args, False, seed_val)
         # Combine the results across all batches. 
-        neg_counts = []
-        for rev in reviews:
-            neg_counts.append(util.has_negation(rev))
+        negation_count_values = []
+        pos_count_values = []
+        for rev in input_reviews:
+            negation_count_values.append(util.has_negation(rev))
+            doc = nlp(rev)
+            pos = 0
+            for token in doc:
+                if token.text in vader_sentiment_scores and vader_sentiment_scores[token.text.lower()] >= 1:
+                    pos += 1
+            pos_count_values.append(pos)
 
         flat_predictions = np.concatenate(preds, axis=0)
 
@@ -257,38 +276,70 @@ if __name__=="__main__":
 
         correct_indices = np.argwhere(flat_predictions == flat_true_labels).flatten()
         incorrect_indices = np.argwhere(flat_predictions != flat_true_labels).flatten()
+        print("correct_indices: ", correct_indices.shape)
+        print("incorrect_indices: ", incorrect_indices.shape)
         correct_negation_count = 0
         incorrect_negation_count = 0
 
+        has_pos_count = 0
+        for val in pos_count_values:
+            if val>0:
+                has_pos_count += 1
+        no_pos_count = len(pos_count_values)-has_pos_count
+
+        has_negation_count = 0
+        for val in negation_count_values:
+            if val>0:
+                has_negation_count += 1
+        no_negation_count = len(negation_count_values)-has_negation_count
+
+        correct_pos_count = 0
+        incorrect_pos_count = 0
+
         for idx in correct_indices:
-            if neg_counts[idx] > 0:
+            if negation_count_values[idx] > 0:
                 correct_negation_count+=1
         for idx in incorrect_indices:
-            if neg_counts[idx] > 0:
+            if negation_count_values[idx] > 0:
                 incorrect_negation_count+=1
+
+        for idx in correct_indices:
+            if pos_count_values[idx] > 0:
+                correct_pos_count+=1
+        for idx in incorrect_indices:
+            if pos_count_values[idx] > 0:
+                incorrect_pos_count+=1
+
         # dataset_name = os.path.basename(os.path.dirname(args.model_path))
         accuracies_df = accuracies_df.append({
-            "dataset": args.input_file,
-            "name": args.name,
-            "seed_val": seed_val,
+            "input_file": args.input_file,
+            "output_file": args.output_file, 
+            # "name": args.name,
+            # "seed_val": seed_val,
             "accuracy": accuracy,
             "correct_count": correct_count,
             "total_count": total_count,
-            "true_rate": true_rate,
-            "false_rate": false_rate,
+            "total_negation_count": has_negation_count,
             "correct_negation_count": correct_negation_count,
-            "incorrect_negation_count": incorrect_negation_count
+            "incorrect_negation_count": incorrect_negation_count,
+            "total_count_with_pos_words": has_pos_count,
+            "correct_count_with_pos_words": correct_pos_count,
+            "incorrect_count_with_pos_words": incorrect_pos_count
         }, ignore_index=True)
         
         iprint(f"Accuracy: {accuracy}")
+        iprint(f"Has negation accuracy: {correct_negation_count*1.0/has_negation_count}")
+        iprint(f"No negation accuracy: {(correct_count-correct_negation_count)*1.0/(total_count-has_negation_count)}")
+        iprint(f"Has pos accuracy: {correct_pos_count*1.0/has_pos_count}")
+        iprint(f"No pos accuracy: {(correct_count-correct_pos_count)*1.0/(total_count-has_pos_count)}")
         # iprint(f"Score: {score}")
 
-    save_pickle_path = os.path.join("testing_pickle_saves", 
-        # os.path.basename(os.path.dirname(args.model_path)),
-        args.name,
-        os.path.basename(args.input_file))
-    Path(os.path.dirname(save_pickle_path)).mkdir(parents=True, exist_ok=True)
-    pickle.dump(accuracies_df, open(save_pickle_path, "wb"))
+    # save_pickle_path = os.path.join("testing_pickle_saves", 
+    #     # os.path.basename(os.path.dirname(args.model_path)),
+    #     args.name,
+    #     os.path.basename(args.input_file))
+
+    # pickle.dump(accuracies_df, open(save_pickle_path, "wb"))
         
     print(accuracies_df)
 

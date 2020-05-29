@@ -10,8 +10,25 @@ import logging
 from pathlib import Path
 import spacy
 import random
+import vader_negation_util
+
 
 nlp = spacy.load("en_core_web_md")
+
+def filter_amazon(plot_data): 
+    amazon_names = ['Pet Supplies', 'Luxury Beauty', 'Automotive', 'Cellphones', 'Sports']
+    # amazon_names = [val.lower() for val in amazon_names]   
+    amazon_names = [val.strip().replace(" ", "_").lower() for val in amazon_names]   
+    plot_data_amz = []
+    plot_data_non_amz = []
+    for d in plot_data:
+        if d['name'].lower() in amazon_names:
+            plot_data_amz.append(d)
+        else:
+            plot_data_non_amz.append(d)
+
+    return plot_data_amz, plot_data_non_amz
+
 
 def get_filename(time: int, util_name:str =""):   
     # print(args)    
@@ -102,3 +119,17 @@ def read_samples_new(filename0: str, filename1: str, seed_val:int, n_samples:int
     reviews = reviews_0+reviews_1
     reviews = [rev.lower() for rev in reviews]
     return reviews, labels
+
+
+def has_negation(text):
+    words = text.strip("\n").split()
+    neg_count = vader_negation_util.negated(words)
+    return neg_count
+        
+def read_file(filename):
+    reviews = []    
+    with open(filename, "r") as fin:    
+        for line in fin:
+            line = line.strip("\n")
+            reviews.append(line)
+        return reviews
