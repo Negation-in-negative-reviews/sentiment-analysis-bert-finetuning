@@ -25,7 +25,7 @@ iprint = pp.pprint
 
 nlp = spacy.load("en_core_web_md")
 
-def test(args: dict(), save_flag: bool, seed_val):
+def test(args, testfile, true_label, save_flag: bool, seed_val):
     
     device = util.get_device(device_no=args.device_no)   
     model = torch.load(args.model_path, map_location=device)
@@ -36,8 +36,8 @@ def test(args: dict(), save_flag: bool, seed_val):
     torch.manual_seed(seed_val)
     torch.cuda.manual_seed_all(seed_val)
     
-    testfile = args.output_file
-    true_label = args.label
+    # testfile = args.output_file
+    # true_label = args.label
     truncation = args.truncation
     n_samples = None
     if "n_samples" in args:
@@ -180,12 +180,22 @@ if __name__=="__main__":
     parser = argparse.ArgumentParser()
 
     ## Required parameters
-    parser.add_argument("--input_file",
+    parser.add_argument("--pos_input_file",
                         default=None,
                         type=str,
                         required=True,
                         help="")
-    parser.add_argument("--output_file",
+    parser.add_argument("--pos_output_file",
+                        default=None,
+                        type=str,
+                        required=True,
+                        help="")
+    parser.add_argument("--neg_input_file",
+                        default=None,
+                        type=str,
+                        required=True,
+                        help="")
+    parser.add_argument("--neg_output_file",
                         default=None,
                         type=str,
                         required=True,
@@ -200,11 +210,11 @@ if __name__=="__main__":
                         type=str,
                         required=True,
                         help="")
-    parser.add_argument("--label",
-                        default=None,
-                        type=str,
-                        required=True,
-                        help="")
+    # parser.add_argument("--label",
+    #                     default=None,
+    #                     type=str,
+    #                     required=True,
+    #                     help="")
     # parser.add_argument("--name",
     #                     default=None,
     #                     type=str,
@@ -226,17 +236,26 @@ if __name__=="__main__":
     pd.set_option('display.width', None)
     pd.set_option('display.max_colwidth', -1)
 
-    seed_vals = [23]
-    accuracies_df = pd.DataFrame(columns=['dataset', 'seed_val', 'accuracy', 'score'])
+    # seed_vals = [23]
+    accuracies_df = pd.DataFrame()
 
     iprint(f"Args: {args}")
-    input_reviews = util.read_file(args.input_file)
+    total_accuracy = []
+    has_negation_accs = []
+    no_negation_accs = []
+
+    has_pos_accs = []
+    no_pos_accs = []
     
     vader_sentiment_scores = vader_negation_util.read_vader_sentiment_dict()
-
-    for seed_val in seed_vals:    
+    seed_val = 23
+    for input_file, output_file, label in zip([args.pos_input_file, args.neg_input_file], 
+            [args.pos_output_file, args.neg_output_file], ["negative", "positive"]):    
+        print(input_file)
+        print(output_file)
+        input_reviews = util.read_file(input_file)
         iprint(f"seed val: {seed_val}")
-        preds, true_labels, translated_reviews = test(args, False, seed_val)
+        preds, true_labels, translated_reviews = test(args, output_file, label, False, seed_val)
         # Combine the results across all batches. 
         negation_count_values = []
         pos_count_values = []
@@ -260,14 +279,14 @@ if __name__=="__main__":
         score = 0
         correct_count = np.sum(flat_predictions == flat_true_labels)
         total_count = flat_predictions.shape[0]
-        if args.label == "positive":
+        if label == "positive":
             TPR = 1.0*correct_count/total_count
             FNR = 1.0*(total_count-correct_count)/total_count
             score = accuracy*TPR+(1-accuracy)*FNR
             true_rate = TPR
             false_rate = FNR
 
-        elif args.label == "negative":            
+        elif label == "negative":            
             TNR = 1.0*correct_count/total_count
             FPR = 1.0*(total_count-correct_count)/total_count
             score = accuracy*TNR+(1-accuracy)*FPR
@@ -276,8 +295,8 @@ if __name__=="__main__":
 
         correct_indices = np.argwhere(flat_predictions == flat_true_labels).flatten()
         incorrect_indices = np.argwhere(flat_predictions != flat_true_labels).flatten()
-        print("correct_indices: ", correct_indices.shape)
-        print("incorrect_indices: ", incorrect_indices.shape)
+        # print("correct_indices: ", correct_indices.shape)
+        # print("incorrect_indices: ", incorrect_indices.shape)
         correct_negation_count = 0
         incorrect_negation_count = 0
 
@@ -312,10 +331,10 @@ if __name__=="__main__":
 
         # dataset_name = os.path.basename(os.path.dirname(args.model_path))
         accuracies_df = accuracies_df.append({
-            "input_file": args.input_file,
-            "output_file": args.output_file, 
+            
             # "name": args.name,
-            # "seed_val": seed_val,
+            "seed_val": seed_val,
+            "review_category": label, 
             "accuracy": accuracy,
             "correct_count": correct_count,
             "total_count": total_count,
@@ -324,14 +343,23 @@ if __name__=="__main__":
             "incorrect_negation_count": incorrect_negation_count,
             "total_count_with_pos_words": has_pos_count,
             "correct_count_with_pos_words": correct_pos_count,
-            "incorrect_count_with_pos_words": incorrect_pos_count
+            "incorrect_count_with_pos_words": incorrect_pos_count,
+            "pos_input_file": os.path.basename(args.pos_input_file),
+            "neg_input_file": os.path.basename(args.neg_input_file),
+            "pos_output_file": os.path.basename(args.pos_output_file),
+            "neg_output_file": os.path.basename(args.neg_output_file), 
         }, ignore_index=True)
         
         iprint(f"Accuracy: {accuracy}")
+        total_accuracy.append(accuracy)
         iprint(f"Has negation accuracy: {correct_negation_count*1.0/has_negation_count}")
+        has_negation_accs.append(correct_negation_count*1.0/has_negation_count)
         iprint(f"No negation accuracy: {(correct_count-correct_negation_count)*1.0/(total_count-has_negation_count)}")
+        no_negation_accs.append((correct_count-correct_negation_count)*1.0/(total_count-has_negation_count))
         iprint(f"Has pos accuracy: {correct_pos_count*1.0/has_pos_count}")
+        has_pos_accs.append(correct_pos_count*1.0/has_pos_count)
         iprint(f"No pos accuracy: {(correct_count-correct_pos_count)*1.0/(total_count-has_pos_count)}")
+        no_pos_accs.append((correct_count-correct_pos_count)*1.0/(total_count-has_pos_count))
         # iprint(f"Score: {score}")
 
     # save_pickle_path = os.path.join("testing_pickle_saves", 
@@ -340,7 +368,11 @@ if __name__=="__main__":
     #     os.path.basename(args.input_file))
 
     # pickle.dump(accuracies_df, open(save_pickle_path, "wb"))
-        
+    print("Avg accuracy: ", np.mean(total_accuracy)) 
+    print("Has negation accuracy: ", np.mean(has_negation_accs)) 
+    print("No negation accuracy: ", np.mean(no_negation_accs)) 
+    print("Has pos accuracy: ", np.mean(has_pos_accs)) 
+    print("No pos accuracy: ", np.mean(no_pos_accs)) 
     print(accuracies_df)
 
     

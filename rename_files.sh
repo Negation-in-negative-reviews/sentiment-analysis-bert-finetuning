@@ -1,0 +1,5 @@
+#!/bin/sh
+mv testing_pickle_saves/yelp/review.0_test_50k_sents testing_pickle_saves/yelp/neg_sents_test
+mv testing_pickle_saves/yelp/review.1_test_50k_sents testing_pickle_saves/yelp/pos_sents_test
+mv testing_pickle_saves/imdb/neg_test_reviews_10000sents testing_pickle_saves/imdb/neg_sents_test
+mv testing_pickle_saves/imdb/pos_test_reviews_10000sents testing_pickle_saves/imdb/pos_sents_test
