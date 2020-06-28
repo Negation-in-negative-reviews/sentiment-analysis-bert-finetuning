@@ -179,6 +179,9 @@ def test(args: dict(), save_flag: bool, seed_val):
 
 if __name__=="__main__":
 
+    saves_dir = "review_model_review_testing_outputs"
+    
+
     parser = argparse.ArgumentParser()
 
     ## Required parameters
@@ -223,7 +226,7 @@ if __name__=="__main__":
     pd.set_option('display.width', None)
     pd.set_option('display.max_colwidth', -1)
 
-    with open("sent_analysis_testing_csv_saves/"+args.name+"_"+args.label+'.csv', "w") as csv_file:
+    with open(saves_dir+"/"+args.name+"_"+args.label+'.csv', "w") as csv_file:
         csv_writer = csv.writer(csv_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
         # csv_writer.writerow([
         #     "dataset",
@@ -362,7 +365,7 @@ if __name__=="__main__":
             iprint(f"Accuracy: {accuracy}")
             # iprint(f"Score: {score}")
 
-        save_pickle_path = os.path.join("sent_analysis_testing_pickle_saves", 
+        save_pickle_path = os.path.join(saves_dir, 
             # os.path.basename(os.path.dirname(args.model_path)),
             args.name,
             os.path.basename(args.input_file))
