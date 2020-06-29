@@ -1,4 +1,6 @@
-# python code/plot_testing_results.py --saves_dir=testing_pickle_saves --bargraph_savepath=testing_pickle_saves/testing_accuracies
+# Command to run this file
+# python code/plot_testing_results.py --saves_dir=testing_pickle_saves \
+# --bargraph_savepath=testing_pickle_saves/testing_accuracies
 
 import pickle
 import argparse
@@ -26,23 +28,21 @@ def read_and_process(args):
         "sports_and_outdoors": "Sports", 
     }
     plot_df = pd.DataFrame()
-    # for subdir in os.listdir(args.saves_dir):
-    for d in list(names_map.keys()):
-        # print(subdir)
-        # if os.path.isdir(os.path.join(args.saves_dir, subdir)):
+    
+    for d in list(names_map.keys()):        
         if True:
             pos_file = os.path.join(args.saves_dir, d, "pos_sents_test")        
             neg_file = os.path.join(args.saves_dir, d, "neg_sents_test")
-            # print(neg_file)
+            
             data_pos = pickle.load(open(pos_file, "rb"))
             data_neg = pickle.load(open(neg_file, "rb"))
 
             pos_file_review_testing = os.path.join(REVIEW_TESTING_DIR, d, "pos_reviews_test")        
             neg_file_review_testing = os.path.join(REVIEW_TESTING_DIR, d, "neg_reviews_test")
-            # print(neg_file)
+            
             data_pos_review_testing = pickle.load(open(pos_file_review_testing, "rb"))
             data_neg_review_testing = pickle.load(open(neg_file_review_testing, "rb"))
-            # print(data_neg)
+            
             dataset_name = data_pos["name"].to_list()[0]
             if args.type == "normal_plot":
                 plot_df = plot_df.append({
@@ -81,8 +81,7 @@ def read_and_process(args):
                 }, ignore_index=True)
 
                 acc = data_df_plot["correct_count_with_negation"].to_list()[0]/data_df_plot["total_negation_count"].to_list()[0]
-                if args.correction_score == True:
-                    # accuracy = data_df_plot["accuracy"].to_list()[0]
+                if args.correction_score == True:                    
                     true_rate = data_df_plot_review_testing["correct_count_with_negation"].to_list()[0]/ \
                         data_df_plot_review_testing["total_negation_count"].to_list()[0]
                     false_rate = data_df_plot_review_testing["incorrect_count_with_negation"].to_list()[0]/ \
@@ -109,25 +108,7 @@ def read_and_process(args):
                     "name": names_map[dataset_name],
                     "category": "sentences with positive lexicons",
                     "accuracy": acc,
-                }, ignore_index=True)
-
-    # plot_df = plot_df.append({
-    #     "name": names_map[dataset_name],
-    #     "category": "all sentences",
-    #     "accuracy": ,
-    # }, ignore_index=True)
-
-    # plot_df = plot_df.append({
-    #     "name": "SST",
-    #     "category": "sentences with positive lexicons",
-    #     "accuracy": ,
-    # }, ignore_index=True)
-
-    # plot_df = plot_df.append({
-    #     "name": names_map[dataset_name],
-    #     "category": "sentences with negation",
-    #     "accuracy": ,
-    # }, ignore_index=True)
+                }, ignore_index=True)    
 
     
     amazon_names = ['Pet Supplies', 'Luxury Beauty', 'Automotive', 'Cellphones', 'Sports']
@@ -136,8 +117,7 @@ def read_and_process(args):
         colors = [(84/255, 141/255, 255/255),  (84/255, 141/255, 255/255)]*2
     elif args.type == "negation_positive_plot":
         colors = [(183/255, 183/255, 183/255),(67/255, 144/255, 188/255), (2/255, 72/255, 110/255)]*2
-
-    # print(plot_df)
+    
     Path(os.path.join(args.saves_dir, "df_outputs")).mkdir(parents=True, exist_ok=True)
     plot_df.to_csv(os.path.join(args.saves_dir, "df_outputs",
         'df_outputs_correction_'+str(args.correction_score)+'_'+args.type+'_'+args.label+'_reviews.csv') )

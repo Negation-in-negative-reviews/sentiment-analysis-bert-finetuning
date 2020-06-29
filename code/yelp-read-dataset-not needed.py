@@ -2,8 +2,6 @@ import os
 import spacy
 import numpy as np
 
-
-
 def read_file(filename):
     reviews = []
     with open(filename, "r") as fin:

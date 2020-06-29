@@ -15,6 +15,10 @@ import datetime
 import logging
 from torch import nn
 import argparse
+import pprint
+
+pp = pprint.PrettyPrinter(indent=4)
+myprint = pp.pprint
 
 # Function to calculate the accuracy of our predictions vs labels
 def flat_accuracy(preds, labels):
@@ -34,6 +38,8 @@ def format_time(elapsed):
 
 
 def train_model(args: dict, hparams:dict):
+    # Code for this function adopted from https://mccormickml.com/2019/07/22/BERT-fine-tuning/
+    
     pos_file = args.pos_file
     neg_file = args.neg_file
     truncation = args.truncation
@@ -58,26 +64,16 @@ def train_model(args: dict, hparams:dict):
     logger.info("Neg file: "+str(neg_file))
     logger.info("Parameters: "+str(args))
     logger.info("Truncation: "+truncation)
-    # Load the BERT tokenizer.
 
+    # Load the BERT tokenizer.
     logger.info('Loading BERT tokenizer...')
     tokenizer = BertTokenizer.from_pretrained('bert-base-uncased', do_lower_case=True)
     max_len = 0
 
-    # reviews, labels = util.read_samples(filename0=neg_file, filename1=pos_file, seed_val=seed_val, n_samples=n_samples)
     reviews, labels = util.read_samples_new(filename0=neg_file, filename1=pos_file, 
         seed_val=seed_val, n_samples=n_samples, sentence_flag=True)
     print(len(reviews), len(labels))
     
-    # For every sentence...
-    # for rev in reviews:
-    #     # Tokenize the text and add `[CLS]` and `[SEP]` tokens.
-    #     input_ids = tokenizer.encode(rev, add_special_tokens=True)
-    #     # Update the maximum sentence length.
-    #     max_len = max(max_len, len(input_ids))
-        
-    # print('Max sentence length: ', max_len)
-
     # Tokenize all of the sentences and map the tokens to thier word IDs.
     input_ids = []
     attention_masks = []
@@ -117,7 +113,6 @@ def train_model(args: dict, hparams:dict):
                         )
             
             # Add the encoded sentence to the list.    
-            # if len(rev)
             input_ids.append(encoded_dict['input_ids'])
             
             # And its attention mask (simply differentiates padding from non-padding).
@@ -139,10 +134,9 @@ def train_model(args: dict, hparams:dict):
     # Divide the dataset by randomly selecting samples.
     train_dataset, val_dataset = random_split(dataset, [train_size, val_size])
 
-    # print('{:>5,} training samples'.format(train_size))
     logger.info('{:>5,} training samples'.format(train_size))
-    # print('{:>5,} validation samples'.format(val_size))
     logger.info('{:>5,} validation samples'.format(val_size))
+
     # The DataLoader needs to know our batch size for training, so we specify it 
     # here. For fine-tuning BERT on a specific task, the authors recommend a batch 
     # size of 16 or 32.
@@ -168,18 +162,12 @@ def train_model(args: dict, hparams:dict):
     # linear classification layer on top. 
     model = BertForSequenceClassification.from_pretrained(        
         "bert-base-uncased", # Use the 12-layer BERT model, with an uncased vocab.
-        # config=configuration,
         num_labels = 2, # The number of output labels--2 for binary classification.
                         # You can increase this for multi-class tasks.   
         output_attentions = False, # Whether the model returns attentions weights.
         output_hidden_states = False, # Whether the model returns all hidden-states.        
     )
-    # if torch.cuda.device_count() > 1:
-    #     print("Let's use", torch.cuda.device_count(), "GPUs!")
-    #     # dim = 0 [30, xxx] -> [10, ...], [10, ...], [10, ...] on 3 GPUs
-    #     model = nn.DataParallel(model, device_ids=[1,2,3])    
-
-    # model.classifier = nn.Linear(args["final_hidden_size"], model.config.num_labels)
+    
     # Tell pytorch to run this model on the GPU.
     model = model.to(device=device)
     # model.cuda(device=device)
@@ -218,9 +206,6 @@ def train_model(args: dict, hparams:dict):
     # validation accuracy, and timings.
     training_stats = []
 
-    # Measure the total training time for the whole run.
-    total_t0 = time.time()
-
     # For each epoch...
     for epoch_i in range(0, epochs):
         
@@ -232,9 +217,6 @@ def train_model(args: dict, hparams:dict):
         logger.info("")
         logger.info('======== Epoch {:} / {:} ========'.format(epoch_i + 1, epochs))
         logger.info('Training...')
-
-        # Measure how long the training epoch takes.
-        t0 = time.time()
 
         # Reset the total loss for this epoch.
         total_train_loss = 0
@@ -249,13 +231,9 @@ def train_model(args: dict, hparams:dict):
         for step, batch in enumerate(train_dataloader):
 
             # Progress update every 40 batches.
-            if step % 40 == 0 and not step == 0:
-                # Calculate elapsed time in minutes.
-                # elapsed = format_time(time.time() - t0)
-                elapsed = 0
-                
+            if step % 40 == 0 and not step == 0:               
                 # Report progress.
-                logger.info('  Batch {:>5,}  of  {:>5,}.    Elapsed: {:}.'.format(step, len(train_dataloader), elapsed))
+                logger.info('  Batch {:>5,}  of  {:>5,}. '.format(step, len(train_dataloader)))
 
             # Unpack this training batch from our dataloader. 
             #
@@ -311,15 +289,10 @@ def train_model(args: dict, hparams:dict):
 
         # Calculate the average loss over all of the batches.
         avg_train_loss = total_train_loss / len(train_dataloader)            
-        
-        # Measure how long this epoch took.
-        # training_time = format_time(time.time() - t0)
 
-        # print("")
-        # print("  Average training loss: {0:.2f}".format(avg_train_loss))
         logger.info("")
         logger.info("  Average training loss: {0:.2f}".format(avg_train_loss))
-        # print("  Training epoch took: {:}".format(training_time))
+
             
         # ========================================
         #               Validation
@@ -330,8 +303,6 @@ def train_model(args: dict, hparams:dict):
         logger.info("")
         logger.info("Running Validation...")
 
-        t0 = time.time()
-
         # Put the model in evaluation mode--the dropout layers behave differently
         # during evaluation.
         model.eval()
@@ -339,7 +310,6 @@ def train_model(args: dict, hparams:dict):
         # Tracking variables 
         total_eval_accuracy = 0
         total_eval_loss = 0
-        nb_eval_steps = 0
 
         # Evaluate data for one epoch
         for batch in validation_dataloader:
@@ -391,12 +361,8 @@ def train_model(args: dict, hparams:dict):
 
         # Calculate the average loss over all of the batches.
         avg_val_loss = total_eval_loss / len(validation_dataloader)
-        
-        # Measure how long the validation run took.
-        # validation_time = format_time(time.time() - t0)
-        
-        logger.info("  Validation Loss: {0:.2f}".format(avg_val_loss))
-        # print("  Validation took: {:}".format(validation_time))
+               
+        logger.info("  Validation Loss: {0:.2f}".format(avg_val_loss))        
 
         # Record all statistics from this epoch.
         training_stats.append(
@@ -404,9 +370,7 @@ def train_model(args: dict, hparams:dict):
                 'epoch': epoch_i + 1,
                 'Training Loss': avg_train_loss,
                 'Valid. Loss': avg_val_loss,
-                'Valid. Accur.': avg_val_accuracy,
-                # 'Training Time': training_time,
-                # 'Validation Time': validation_time
+                'Valid. Accur.': avg_val_accuracy,                
             }
         )
 
@@ -419,7 +383,6 @@ def train_model(args: dict, hparams:dict):
     for handler in handlers:
         handler.close()
         logger.removeHandler(handler)
-    # print("Total training took {:} (h:mm:ss)".format(format_time(time.time()-total_t0)))
 
 
 if __name__=="__main__":   
@@ -458,7 +421,10 @@ if __name__=="__main__":
             "batch_size": 8,
             "seed_val": 23,
             "adam_epsilon": 1e-8
-        },        
+        },  
+
+        # Don't use the below hyperparameter because we have already tested that 
+        # the model performs best for the previous hyperparameter.
         # {
         #     "learning_rate": 1e-5,
         #     "batch_size": 8,
@@ -468,8 +434,8 @@ if __name__=="__main__":
     ]
 
     for hparams in hyperparams:         
-        print(args)    
-        print(hparams)       
+        myprint(f"args: {args}")    
+        myprint(f"hparams: {hparams}")
         train_model(args, hparams)
         
 

@@ -44,21 +44,7 @@ def test(args: dict(), save_flag: bool, seed_val):
     n_samples = None
     if "n_samples" in args:
         n_samples = args.n_samples
-
-    # saves_dir = "saves/"  
-    # time = datetime.datetime.now()
-    # saves_path = os.path.join(saves_dir, util.get_filename(time))
-    # if save_flag:
-    #     Path(saves_path).mkdir(parents=True, exist_ok=True)
-
-
-    # log_path = os.path.join(saves_path, "testing.log")
-
-    # logging.basicConfig(filename=log_path, filemode='w', format='%(name)s - %(levelname)s - %(message)s')
-    # logger=logging.getLogger() 
-    # logger.setLevel(logging.DEBUG)
-
-    
+   
     # Load the BERT tokenizer.
     # logger.info('Loading BERT tokenizer...')
     tokenizer = BertTokenizer.from_pretrained('bert-base-uncased', do_lower_case=True)
@@ -77,14 +63,6 @@ def test(args: dict(), save_flag: bool, seed_val):
     selected_reviews = [reviews[idx] for idx in indices]
 
     labels = [0 if true_label == "negative" else 1]*len(selected_reviews)
-    # For every sentence...
-    # for rev in selected_reviews:
-    #     # Tokenize the text and add `[CLS]` and `[SEP]` tokens.
-    #     input_ids = tokenizer.encode(rev, add_special_tokens=True)
-    #     # Update the maximum sentence length.
-    #     max_len = max(max_len, len(input_ids))
-        
-    # print('Max sentence length: ', max_len)
 
     # Tokenize all of the sentences and map the tokens to thier word IDs.
     input_ids = []
@@ -179,9 +157,8 @@ def test(args: dict(), save_flag: bool, seed_val):
 
 if __name__=="__main__":
 
-    saves_dir = "review_model_review_testing_outputs"
+    SAVES_DIR = "review_model_review_testing_outputs"
     
-
     parser = argparse.ArgumentParser()
 
     ## Required parameters
@@ -226,7 +203,7 @@ if __name__=="__main__":
     pd.set_option('display.width', None)
     pd.set_option('display.max_colwidth', -1)
 
-    with open(saves_dir+"/"+args.name+"_"+args.label+'.csv', "w") as csv_file:
+    with open(SAVES_DIR+"/"+args.name+"_"+args.label+'.csv', "w") as csv_file:
         csv_writer = csv.writer(csv_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
         # csv_writer.writerow([
         #     "dataset",
@@ -298,7 +275,7 @@ if __name__=="__main__":
             incorrect_indices = np.argwhere(flat_predictions != flat_true_labels).flatten()
             correct_negation_count = 0
             incorrect_negation_count = 0
-            # print(negation_count_values)
+            
             has_pos_count = 0
             for val in pos_count_values:
                 if val>0:
@@ -327,7 +304,7 @@ if __name__=="__main__":
             for idx in incorrect_indices:
                 if pos_count_values[idx] > 0:
                     incorrect_pos_count+=1
-            # dataset_name = os.path.basename(os.path.dirname(args.model_path))
+            
             accuracies_df = accuracies_df.append({                
                 "dataset": args.input_file,
                 "name": args.name,
@@ -352,8 +329,6 @@ if __name__=="__main__":
                 accuracy,
                 correct_count,
                 total_count,
-                # true_rate,
-                # false_rate,
                 has_negation_count,
                 correct_negation_count,
                 incorrect_negation_count,
@@ -362,11 +337,9 @@ if __name__=="__main__":
                 incorrect_pos_count
             ])
             
-            iprint(f"Accuracy: {accuracy}")
-            # iprint(f"Score: {score}")
+            iprint(f"Accuracy: {accuracy}")            
 
-        save_pickle_path = os.path.join(saves_dir, 
-            # os.path.basename(os.path.dirname(args.model_path)),
+        save_pickle_path = os.path.join(SAVES_DIR,             
             args.name,
             os.path.basename(args.input_file))
         Path(os.path.dirname(save_pickle_path)).mkdir(parents=True, exist_ok=True)
