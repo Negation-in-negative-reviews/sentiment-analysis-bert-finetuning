@@ -31,7 +31,6 @@ def test(args: dict(), save_flag: bool, seed_val):
     
     device = util.get_device(device_no=args.device_no)   
     model = torch.load(args.model_path, map_location=device)
-    # seed_val = 2346610
 
     random.seed(seed_val)
     np.random.seed(seed_val)
@@ -46,7 +45,6 @@ def test(args: dict(), save_flag: bool, seed_val):
         n_samples = args.n_samples
    
     # Load the BERT tokenizer.
-    # logger.info('Loading BERT tokenizer...')
     tokenizer = BertTokenizer.from_pretrained('bert-base-uncased', do_lower_case=True)
     max_len = 0
     reviews = []
@@ -152,7 +150,7 @@ def test(args: dict(), save_flag: bool, seed_val):
         predictions.append(logits)
         true_labels.append(label_ids)
     
-    print('    DONE.')
+    print('DONE.')
     return predictions, true_labels, selected_reviews
 
 if __name__=="__main__":
@@ -345,6 +343,6 @@ if __name__=="__main__":
         Path(os.path.dirname(save_pickle_path)).mkdir(parents=True, exist_ok=True)
         pickle.dump(accuracies_df, open(save_pickle_path, "wb"))
             
-        print(accuracies_df)
+        print("accuracies_df: ", accuracies_df)
 
     

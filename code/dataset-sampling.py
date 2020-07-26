@@ -1,4 +1,5 @@
 import numpy as np
+import argparse
 
 def get_random_samples(n_samples:int, filename: str, rand_flag:bool):
 
@@ -27,30 +28,35 @@ def write_to_file(filename: str, data: list):
 
 
 if __name__ == "__main__":
-    seed_val = 23
-    np.random.seed(seed_val)
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--pos_file",
+                        default=None,
+                        type=str,
+                        required=True,
+                        help="")
+    parser.add_argument("--neg_file",
+                        default=None,
+                        type=str,
+                        required=True,
+                        help="")
+    parser.add_argument("--seed_val",
+                        default=23,
+                        type=int,                        
+                        help="")
+    parser.add_argument("--n_samples",
+                        default=None,
+                        type=str,                        
+                        help="")
     
-    # n_samples = 10000
-    # file0 = "/data/madhu/imdb_dataset/processed_data/neg_samples_full_sents"
-    # file1 = "/data/madhu/imdb_dataset/processed_data/pos_samples_full_sents"
+    args = parser.parse_args()    
+    np.random.seed(args.seed_val)
 
-    n_samples = int(6e3)
-    file0 = "/data/madhu/yelp/yelp_processed_data/review.0"
-    file1 = "/data/madhu/yelp/yelp_processed_data/review.1"
+    fileout0 = args.neg_file+"_"+str(args.n_samples)+"samples"
+    fileout1 = args.pos_file+"_"+str(args.n_samples)+"samples"
 
-    # n_samples = int(5e3)
-    # file0 = "/data/madhu/yelp/shen_et_al_data/sentiment.train.0"
-    # file1 = "/data/madhu/yelp/shen_et_al_data/sentiment.train.1"
-
-    fileout0 = file0+"_"+str(n_samples)+"samples"
-    fileout1 = file1+"_"+str(n_samples)+"samples"
-
-    # fileout0 = file0+"_"+str(n_samples)+"samples_traintest"
-    # fileout1 = file1+"_"+str(n_samples)+"samples_traintest"
-
-    samples0 = get_random_samples(n_samples, file0, True)
+    samples0 = get_random_samples(args.n_samples, args.neg_file, True)
     write_to_file(fileout0, samples0)
 
-    samples1 = get_random_samples(n_samples, file1, True)
+    samples1 = get_random_samples(args.n_samples, args.pos_file, True)
     write_to_file(fileout1, samples1)
 

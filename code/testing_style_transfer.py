@@ -20,6 +20,11 @@ import pickle
 import vader_negation_util
 import spacy
 
+pd.set_option('display.max_rows', None)
+pd.set_option('display.max_columns', None)
+pd.set_option('display.width', None)
+pd.set_option('display.max_colwidth', -1)
+
 pp = pprint.PrettyPrinter(indent=4)
 iprint = pp.pprint
 
@@ -230,13 +235,6 @@ if __name__=="__main__":
                         help="")
     
     args = parser.parse_args()
-    
-    pd.set_option('display.max_rows', None)
-    pd.set_option('display.max_columns', None)
-    pd.set_option('display.width', None)
-    pd.set_option('display.max_colwidth', -1)
-
-    # seed_vals = [23]
     accuracies_df = pd.DataFrame()
 
     iprint(f"Args: {args}")

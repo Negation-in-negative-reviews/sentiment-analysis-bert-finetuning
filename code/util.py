@@ -17,7 +17,6 @@ nlp = spacy.load("en_core_web_md")
 
 def filter_amazon(plot_data): 
     amazon_names = ['Pet Supplies', 'Luxury Beauty', 'Automotive', 'Cellphones', 'Sports']
-    # amazon_names = [val.lower() for val in amazon_names]   
     amazon_names = [val.strip().replace(" ", "_").lower() for val in amazon_names]   
     plot_data_amz = []
     plot_data_non_amz = []
@@ -31,7 +30,6 @@ def filter_amazon(plot_data):
 
 
 def get_filename(time: int, util_name:str =""):   
-    # print(args)    
     filename = str(time.strftime('%b-%d-%Y_%H-%M-%S'))
     if util_name != "":
         filename = util_name+"_"+filename
