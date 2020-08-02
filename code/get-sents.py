@@ -4,9 +4,15 @@ import os
 import argparse
 
 nlp = spacy.load("en_core_web_md")
-tokenizer = nlp.Defaults.create_tokenizer(nlp)
 
-def write_sents_to_file(in_file, out_file):
+def write_sents_to_file(in_file: str, out_file: str):
+    """Reads the input file and extracts sentences from reviews in that file, and writes to a output file.
+
+    Args:
+        in_file (str): Filename to read reviews from
+        out_file (str): Filename to write sentences of reviews to
+    """    
+    tokenizer = nlp.Defaults.create_tokenizer(nlp)
     f_out = open(out_file, "w")
     count = 0
     with open(in_file, "r") as f_in:

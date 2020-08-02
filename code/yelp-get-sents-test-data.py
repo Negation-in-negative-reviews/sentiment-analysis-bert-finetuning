@@ -16,8 +16,6 @@ def get_sents(reviews):
         doc = nlp(review)
         sentences = list(doc.sents)
         for sent in sentences:
-            # tokens = tokenizer(sent.string.strip())
-            # if len(tokens) >= 5:
             selected_sents.append(sent.string.strip().strip("\n")) 
 
     return selected_sents
